@@ -1,0 +1,29 @@
+---
+const SITE = 'https://www.wellspringonmain.org';
+const links = [
+  { label: 'Rental options', href: `${SITE}/services-4` },
+  { label: 'Programs + Projects', href: `${SITE}/projects-1` },
+  { label: 'Community activities', href: `${SITE}/general-clean` },
+  { label: 'Gallery', href: `${SITE}/gallery` },
+  { label: 'Testimonials', href: `${SITE}/testimonials` },
+  { label: 'FAQs', href: `${SITE}/faqs` },
+  { label: 'Contact us', href: `${SITE}/contact-us` },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="brand-name">Wellspring on Main</span>
+        <span>Arlington's Center for Community Engagement</span>
+        <span>201 W. Main St., Downtown Arlington, Texas</span>
+      </div>
+      <nav aria-label="Footer" class="footer-nav">
+        {links.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+    </div>
+    <div class="legal">© {year} Arlington Center for Community Engagement, Inc.</div>
+  </div>
+</footer>

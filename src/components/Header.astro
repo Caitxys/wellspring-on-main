@@ -1,0 +1,35 @@
+---
+const SITE = 'https://www.wellspringonmain.org';
+---
+
+<div class="utility">
+  <div class="container">
+    <span>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+      201 W. Main St., Downtown Arlington, Texas
+    </span>
+    <a href={`${SITE}/contact-us`}>Contact us</a>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="brand">
+      <span class="brand-mark">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 7 12 3z"></path></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">Wellspring on Main</span>
+        <span class="brand-tag">Arlington's Center for Community Engagement</span>
+      </span>
+    </a>
+    <nav aria-label="Main" class="main-nav">
+      <a href="/#about">About</a>
+      <a href="/#rentals">Rental options</a>
+      <a href="/#programs">Programs + Projects</a>
+      <a href={`${SITE}/gallery`}>Gallery</a>
+      <a href={`${SITE}/faqs`}>FAQs</a>
+      <a href={`${SITE}/contact-us`} class="btn btn-primary">Book a space</a>
+    </nav>
+  </div>
+</header>
