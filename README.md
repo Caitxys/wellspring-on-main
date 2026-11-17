@@ -1,46 +1,29 @@
-# Wellspring on Main
+# Wellspring Content Update Manager — Prototype (Assignment 6)
 
-Website for Wellspring on Main (Arlington's Center for Community Engagement), built with
-[Astro](https://astro.build), served by Node (`@astrojs/node`), with a [Supabase](https://supabase.com) database.
+Clickable HTML prototype for the Wellspring content-update workflow.
 
-## Setup
+## How to open
+1. Unzip the folder.
+2. Double-click `index.html` to open it in a web browser (Chrome, Edge, Firefox, or Safari).
+   Or open the folder in VS Code and start Live Server on `index.html`.
+3. Use the **View as** menu in the dark footer (prototype only) to switch between
+   Program lead (Maya Okafor), Content owner (Jordan Ellis), and Visitor.
 
-```powershell
-npm install
-Copy-Item .env.example .env   # then fill in your Supabase URL and keys
-npm run dev                   # http://localhost:4321
-```
+## Suggested walkthrough
+1. Program lead: Submit update → choose a content item, leave Proposed details empty, Submit (error) → fill it in, Submit (confirmation) → My requests.
+2. Content owner: Review queue → filter by status → Review request #2 → edit the text → Approve and publish.
+3. Content owner: My content → Show "Everything" → Archive "Holiday Hours".
+4. Visitor: Event rentals page shows the approved rates; Home no longer shows Holiday Hours.
 
-## Scripts
+## Simulated behavior
+- No database connection. `data.js` holds sample records that mirror our Assignment 4 database
+  (staff, web_page, content_item, update_request, audience, content_audience).
+- All changes stay in browser memory and reset when the page reloads.
+- Validation runs in the browser only. In Assignment 7 the Express routes and database
+  constraints must enforce the same rules.
 
-| Command           | What it does                              |
-| ----------------- | ----------------------------------------- |
-| `npm run dev`     | Start the dev server                      |
-| `npm run build`   | Build to `./dist/`                        |
-| `npm run preview` | Preview the production build              |
-| `npm start`       | Run the built Node server (`dist/server`) |
-
-## Supabase
-
-The client lives in `src/lib/supabase.ts`. Import it in any page or API route:
-
-```ts
-import { supabase } from '../lib/supabase';
-const { data, error } = await supabase.from('your_table').select('*');
-```
-
-Pages are static by default. For pages or API routes that should read or write live data,
-add `export const prerender = false;` at the top so they run on the Node server.
-
-Never commit `.env` or put the service role key in a `PUBLIC_` variable.
-
-## Project structure
-
-```
-src/
-  components/   Header, Footer
-  layouts/      Base HTML layout
-  lib/          Supabase client
-  pages/        Routes (index.astro = home page)
-  styles/       global.css (design tokens + styles)
-```
+## Files
+- `index.html` — page shell
+- `styles.css` — styles using the Wellspring Design System tokens (Figma "Foundations" page)
+- `app.js` — screens, role switcher, and simulated actions
+- `data.js` — sample data
