@@ -210,11 +210,13 @@ Each line says "this action is allowed for these roles". Add or remove a role na
 
 If you ever need to recreate this in a brand-new project, these are the steps that were taken, in order. Each one maps to files that already exist here, so you can copy them over.
 
-1. **Created an Astro website** and added the Node "adapter", which lets pages run on a server instead of being plain files:
+1. **Created an Astro website** and added the Cloudflare "adapter", which lets pages run on a server (Cloudflare Workers) instead of being plain files. The project started on a Node server and was later switched to Cloudflare for hosting; see [DEPLOY.md](DEPLOY.md).
    ```
    npm create astro@latest
-   npx astro add node
+   npm install @astrojs/cloudflare@12
+   npm install -D wrangler
    ```
+   Then set the adapter in `astro.config.mjs` and add `wrangler.jsonc` and `public/.assetsignore` (copy them from this project).
 2. **Installed the Supabase tools** that handle logins and keep people signed in with a browser cookie:
    ```
    npm install @supabase/supabase-js @supabase/ssr
