@@ -56,6 +56,7 @@ const mine = permissionsFor(staff);
         )
       }
       {can(staff, 'view_all_requests') && <li><a href="/staff/requests">All update requests</a></li>}
+      {can(staff, 'archive_content') && <li><a href="/staff/content">My content (view and archive)</a></li>}
     </ul>
   </section>
 </StaffLayout>
