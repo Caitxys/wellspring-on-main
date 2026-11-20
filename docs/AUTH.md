@@ -2,6 +2,8 @@
 
 This branch adds **authentication** (who is signed in) and **authorization** (what their role allows) to the Astro + Supabase project. The Assignment 7 feature itself is yours to build: the update-request workflow, its pages, validation, and Row Level Security for your tables. The hints at the end show where to start.
 
+New to this? Start with the plain-language walkthrough in [SIGN-IN-README.md](SIGN-IN-README.md).
+
 ## What's included
 
 | File | What it does |
