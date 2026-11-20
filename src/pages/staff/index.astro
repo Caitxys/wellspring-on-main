@@ -1,6 +1,6 @@
 ---
 import StaffLayout from '../../layouts/StaffLayout.astro';
-import { PERMISSIONS, can, permissionsFor } from '../../lib/auth';
+import { PERMISSIONS, can, permissionsFor, type Permission } from '../../lib/auth';
 import { requireStaffPage } from '../../lib/page-guard';
 
 export const prerender = false;
@@ -10,53 +10,89 @@ const staff = requireStaffPage(Astro);
 if (staff instanceof Response) return staff;
 
 const mine = permissionsFor(staff);
+const firstName = staff.full_name.split(/\s+/)[0];
+
+// Plain-language labels for the permission list. A permission without a label
+// shows its code name instead.
+const LABELS: Partial<Record<Permission, string>> = {
+  submit_request: 'Submit update requests',
+  review_request: 'Review requests for content you own',
+  view_all_requests: 'See every update request',
+  archive_content: 'Archive content you own',
+};
+
+// Your tasks: links to the feature pages, shown by role.
+// These pages are built by the team (see docs/FEATURE-GUIDE.md). Until a page
+// file exists, its link shows "404 Not Found". That is expected.
+// Hiding a link is NOT protection: each page and API route checks again.
+type Task = { href: string; title: string; text: string };
+const tasks: Task[] = [];
+if (can(staff, 'submit_request')) {
+  tasks.push(
+    { href: '/staff/requests/new', title: 'Submit an update request', text: 'Ask a content owner to change text on the website.' },
+    { href: '/staff/requests', title: 'My update requests', text: 'Check the status of requests you have sent.' },
+  );
+}
+if (can(staff, 'review_request')) {
+  tasks.push({ href: '/staff/requests?status=pending', title: 'Review queue', text: 'Pending requests for content you own.' });
+}
+if (can(staff, 'view_all_requests')) {
+  tasks.push({ href: '/staff/requests', title: 'All update requests', text: 'Every request from every team, with filters.' });
+}
+if (can(staff, 'archive_content')) {
+  tasks.push({ href: '/staff/content', title: 'My content', text: 'View your content items and archive old ones.' });
+}
 ---
 
 <StaffLayout title="Staff home">
-  <h1>Welcome, {staff.full_name}</h1>
-  <p>You are signed in as <strong>{staff.role}</strong>.</p>
+  <div class="page-head">
+    <p class="eyebrow">Staff home</p>
+    <h1>Welcome, {firstName}</h1>
+    <p class="lead">You are signed in as <strong>{staff.role}</strong>.</p>
+  </div>
 
-  <section class="panel">
-    <h2>What your role allows</h2>
-    <ul>
+  <section aria-labelledby="tasks-heading">
+    <h2 id="tasks-heading" class="section-title">Your tasks</h2>
+    {
+      tasks.length > 0 ? (
+        <ul class="task-grid">
+          {tasks.map((t) => (
+            <li>
+              <a href={t.href} class="task-card">
+                <span class="task-title">{t.title}</span>
+                <span class="task-text">{t.text}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="alert alert-info">Your role has no tasks in the staff portal yet.</p>
+      )
+    }
+  </section>
+
+  <section class="panel" aria-labelledby="perm-heading">
+    <h2 id="perm-heading">What your role allows</h2>
+    <ul class="perm-list">
       {
-        (Object.keys(PERMISSIONS) as (keyof typeof PERMISSIONS)[]).map((p) => (
-          <li>
-            {mine.includes(p) ? '✔' : '✘'} <code>{p}</code>
-          </li>
-        ))
+        (Object.keys(PERMISSIONS) as Permission[]).map((p) => {
+          const ok = mine.includes(p);
+          return (
+            <li class={ok ? 'perm perm-yes' : 'perm perm-no'}>
+              <span class="perm-icon" aria-hidden="true">{ok ? '✓' : '–'}</span>
+              <span>
+                {LABELS[p] ?? p}
+                <span class="visually-hidden">{ok ? ' (allowed)' : ' (not allowed)'}</span>
+                <code class="perm-code">{p}</code>
+              </span>
+            </li>
+          );
+        })
       }
     </ul>
-    <p>
+    <p class="muted small">
       These come from <code>src/lib/auth.ts</code>. The server checks them on every protected request, so hiding a
       link is never the only protection.
     </p>
-  </section>
-
-  <!--
-    Your tasks: links to the feature pages, shown by role.
-    These pages are built by the team (see docs/FEATURE-GUIDE.md). Until a page
-    file exists, its link shows "404 Not Found". That is expected.
-    Hiding a link is NOT protection: each page and API route checks again.
-  -->
-  <section class="panel">
-    <h2>Your tasks</h2>
-    <ul class="task-list">
-      {
-        can(staff, 'submit_request') && (
-          <>
-            <li><a href="/staff/requests/new">Submit an update request</a></li>
-            <li><a href="/staff/requests">My update requests</a></li>
-          </>
-        )
-      }
-      {
-        can(staff, 'review_request') && (
-          <li><a href="/staff/requests?status=pending">Review queue (pending requests for my content)</a></li>
-        )
-      }
-      {can(staff, 'view_all_requests') && <li><a href="/staff/requests">All update requests</a></li>}
-      {can(staff, 'archive_content') && <li><a href="/staff/content">My content (view and archive)</a></li>}
-    </ul>
   </section>
 </StaffLayout>
