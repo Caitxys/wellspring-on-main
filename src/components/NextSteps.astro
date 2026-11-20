@@ -1,0 +1,23 @@
+---
+// Call to action with a big step (request the event) and two smaller ones
+// (tour, question), for visitors who aren't ready to book yet. Static links.
+interface Props {
+  title: string;
+  lead: string;
+  /** Request form link, with the event type filled in when known */
+  requestHref?: string;
+}
+const { title, lead, requestHref = '/event-rentals#request' } = Astro.props;
+---
+
+<div class="cta">
+  <div class="cta-copy">
+    <h2 class="h2">{title}</h2>
+    <p>{lead}</p>
+  </div>
+  <div class="actions">
+    <a href={requestHref} class="btn btn-lg btn-coral">Check availability</a>
+    <a href="/about#tour" class="btn btn-lg btn-secondary">Request a tour</a>
+    <a href="/faqs#ask" class="btn btn-lg btn-secondary">Ask a question</a>
+  </div>
+</div>

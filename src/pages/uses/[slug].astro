@@ -1,0 +1,133 @@
+---
+// One page per use case (src/lib/uses.ts). Static copy, plus two placeholders:
+// rooms that fit this kind of event (Events group) and rates (Content &
+// Community group). The "Check availability" buttons fill in the request
+// form's event type and guest count.
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import DbSlot from '../../components/DbSlot.astro';
+import MissionNote from '../../components/MissionNote.astro';
+import NextSteps from '../../components/NextSteps.astro';
+import { useCases, requestHref, type UseCase } from '../../lib/uses';
+
+export function getStaticPaths() {
+  return useCases.map((u) => ({ params: { slug: u.slug }, props: { u } }));
+}
+
+const { u } = Astro.props as { u: UseCase };
+const others = useCases.filter((o) => o.slug !== u.slug).slice(0, 3);
+---
+
+<Layout title={`${u.name} · Wellspring on Main`} description={`${u.intro} ${u.ideas.slice(0, 4).join(', ')} and more at 201 W. Main St., Arlington, TX.`}>
+  <PageHero eyebrow={u.name} title={u.title} lead={u.intro}>
+    <div class="actions">
+      <a href={requestHref(u)} class="btn btn-lg btn-primary">Check availability</a>
+      <a href="/about#tour" class="btn btn-lg btn-secondary">Request a tour</a>
+    </div>
+  </PageHero>
+
+  <section>
+    <div class="container two-col">
+      <div role="img" aria-label={`Photo placeholder: ${u.name.toLowerCase()} at Wellspring`} class={`placeholder ${u.photoTone} feature-photo`}>
+        [Photo: {u.name.toLowerCase()} at Wellspring]
+      </div>
+      <div class="col-body">
+        <span class="eyebrow">What people host here</span>
+        <h2 class="h2">Popular ideas</h2>
+        <ul class="check-list">
+          {u.ideas.map((i) => <li>{i}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-gray">
+    <div class="container stack">
+      <div class="section-head">
+        <span class="eyebrow">Why Wellspring</span>
+        <h2 class="h2">Why it works here</h2>
+      </div>
+      <div class="sample-grid">
+        {
+          u.reasons.map((r) => (
+            <div class="sample-card">
+              <h3>{r.title}</h3>
+              <p>{r.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container stack">
+      <DbSlot
+        group="events"
+        title="Spaces that fit"
+        source="room table"
+        note={`Rooms whose status is Available, with capacity. For ${u.name.toLowerCase()}, list rooms that hold about ${u.typicalGuests ?? 'the expected number of'} guests or more first. Photos stay static.`}
+      >
+        <div class="sample-grid">
+          {
+            [1, 2].map(() => (
+              <div class="sample-card">
+                <span class="sample-tag">Up to [capacity] guests</span>
+                <h3>[Room name]</h3>
+                <p>[Suggested setup for this kind of event]</p>
+              </div>
+            ))
+          }
+        </div>
+      </DbSlot>
+
+      <DbSlot
+        group="content"
+        title="What it costs"
+        source="content_item on /event-rentals"
+        note={'The same published rates shown on Rental options. Lead with a "starting at" price, since visitors leave venue sites that hide pricing. Include any nonprofit or recurring-booking rate.'}
+      >
+        <div class="sample-card">
+          <h3>[Starting at $___]</h3>
+          <p>[Rates text]</p>
+        </div>
+      </DbSlot>
+    </div>
+  </section>
+
+  <section class="band-gray">
+    <div class="container faq-wrap">
+      <div class="faq-group">
+        <h2 class="h2">Questions people ask first</h2>
+        {
+          u.questions.map((q) => (
+            <details class="faq">
+              <summary>{q}</summary>
+              <p>[Placeholder answer.]</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <MissionNote />
+
+  <section>
+    <div class="container stack">
+      <NextSteps
+        title="Ready to plan?"
+        lead="Check your date, or start smaller: take a tour or ask us a question."
+        requestHref={requestHref(u)}
+      />
+
+      <div class="section-head">
+        <h2 class="h2">Other ways to use Wellspring</h2>
+      </div>
+      <ul class="related">
+        {others.map((o) => <li><a href={`/uses/${o.slug}`}>{o.name}</a> <span>{o.hook}</span></li>)}
+        <li><a href="/uses">See all ways to use Wellspring</a></li>
+      </ul>
+    </div>
+  </section>
+</Layout>

@@ -1,12 +1,43 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { eventTypes } from '../lib/event-types';
+import { useCaseHref } from '../lib/uses';
 
 const SITE = 'https://www.wellspringonmain.org';
 
 ---
 
 <Layout title="Wellspring on Main — Home">
+  <!-- Rental search: the main call to action. Placeholder for the Events
+       group's availability check (room + event tables). For now it only
+       opens the request form on Rental options; it runs no query. -->
+  <section aria-label="Find a space for your event" class="rental-search">
+    <div class="container">
+      <form action="/event-rentals#request" method="get" class="rental-search-form">
+        <div class="rs-field rs-type">
+          <label for="rs-type">Event type</label>
+          <select id="rs-type" name="type">
+            <option value="">Any type of event</option>
+            {eventTypes.map((t) => <option>{t}</option>)}
+          </select>
+        </div>
+        <div class="rs-field">
+          <label for="rs-date">Event date</label>
+          <input id="rs-date" name="date" type="date" />
+        </div>
+        <div class="rs-field rs-guests">
+          <label for="rs-guests">Guests</label>
+          <input id="rs-guests" name="guests" type="number" min="1" inputmode="numeric" placeholder="e.g. 80" />
+        </div>
+        <button type="submit" class="btn btn-lg btn-coral rs-submit">Check availability</button>
+      </form>
+      <p class="rs-note">
+        <span class="db-slot-tag rs-tag">Placeholder · Events group</span>
+        Will check open dates and room capacity from the <code>room</code> and <code>event</code> tables. For now it opens the request form.
+      </p>
+    </div>
+  </section>
+
   <!-- Hero -->
   <section id="top" class="hero">
     <div class="container">
@@ -20,10 +51,7 @@ const SITE = 'https://www.wellspringonmain.org';
         </p>
         <div class="actions">
           <a href="/event-rentals" class="btn btn-lg btn-primary">Explore rental options</a>
-          <a href="#about" class="btn btn-lg btn-secondary">
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M10 8.5l5 3.5-5 3.5z"></path></svg>
-            Watch our story
-          </a>
+          <a href="/uses" class="btn btn-lg btn-secondary">See ways to use Wellspring</a>
         </div>
       </div>
       <div class="hero-media">
@@ -126,10 +154,15 @@ const SITE = 'https://www.wellspringonmain.org';
       <div class="section-head">
         <span class="eyebrow">Host your event</span>
         <h2 class="h2">Room for every kind of gathering</h2>
+        <p class="lead">Pick the kind of event you're planning to see how it works at Wellspring.</p>
       </div>
       <ul aria-label="Event types" class="chips">
-        {eventTypes.map((t) => <li>{t}</li>)}
+        {eventTypes.map((t) => <li><a href={useCaseHref(t)}>{t}</a></li>)}
       </ul>
+      <a href="/uses" class="text-link">
+        See all ways to use Wellspring
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      </a>
       <div class="gallery">
         <div role="img" aria-label="Gallery photo placeholder" class="placeholder">[Gallery photo]</div>
         <div role="img" aria-label="Gallery photo placeholder" class="placeholder tone-teal-dark">[Gallery photo]</div>

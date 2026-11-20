@@ -15,6 +15,10 @@ const groups = [
       'How far ahead should I book?',
       'Can I bring my own caterer?',
       'Is there a deposit?',
+      "What's included with a rental?",
+      'Do you offer a nonprofit rate?',
+      'Can I tour the space before I book?',
+      'Can I book the same time every week or month?',
     ],
   },
   {
@@ -47,6 +51,7 @@ const groups = [
         ))
       }
 
+      <div id="ask">
       <DbSlot
         group="events"
         title="Still have a question?"
@@ -58,9 +63,11 @@ const groups = [
           <li>Topic (general info, tour, spaces, donation)</li>
           <li>Subject</li>
           <li>Your question</li>
+          <li>How did you hear about us?</li>
         </ul>
         <span class="btn btn-primary sample-btn" aria-hidden="true">Send question</span>
       </DbSlot>
+      </div>
     </div>
   </section>
 </Layout>

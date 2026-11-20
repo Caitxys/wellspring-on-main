@@ -8,7 +8,10 @@
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import DbSlot from '../components/DbSlot.astro';
+import MissionNote from '../components/MissionNote.astro';
+import NextSteps from '../components/NextSteps.astro';
 import { eventTypes } from '../lib/event-types';
+import { useCaseHref } from '../lib/uses';
 
 const SITE = 'https://www.wellspringonmain.org';
 
@@ -61,7 +64,7 @@ const amenities = ['[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity
         group="content"
         title="Rates"
         source="content_item on /event-rentals"
-        note="Prices change, so staff keep them up to date through update requests. Show items that are published and not archived. Capacity comes from the room table above, not from this text."
+        note="Prices change, so staff keep them up to date through update requests. Show items that are published and not archived. Lead with a starting price, and list any nonprofit or recurring-booking rate. Capacity comes from the room table above, not from this text."
       >
         <div class="sample-grid">
           <div class="sample-card"><h3>[Content title]</h3><p>[Rates text]</p></div>
@@ -87,9 +90,10 @@ const amenities = ['[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity
         note="Keep this list the same as the event types the request form accepts, so the site never advertises a type that can't be booked."
       >
         <ul aria-label="Event types" class="chips">
-          {eventTypes.map((t) => <li>{t}</li>)}
+          {eventTypes.map((t) => <li><a href={useCaseHref(t)}>{t}</a></li>)}
         </ul>
       </DbSlot>
+      <a href="/uses" class="text-link">Ideas and tips for each kind of event →</a>
     </div>
   </section>
 
@@ -99,7 +103,7 @@ const amenities = ['[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity
         group="events"
         title="Request your event"
         source="client + event tables"
-        note="The Events group's request form. It saves the requester as a client and the request as an event with status 'submitted' for a coordinator to review. Visitors never see other people's requests."
+        note="The Events group's request form. It saves the requester as a client and the request as an event with status 'submitted' for a coordinator to review. Visitors never see other people's requests. Fill in the event type, date and guest count from the link (?type=, ?date=, ?guests=) sent by the home page search and the Ways to use pages."
       >
         <ul class="sample-fields">
           <li>Your name, email and phone</li>
@@ -110,20 +114,19 @@ const amenities = ['[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity
           <li>Preferred room</li>
           <li>Furniture and technology</li>
           <li>Catering and notes</li>
+          <li>How did you hear about us?</li>
         </ul>
         <span class="btn btn-primary sample-btn" aria-hidden="true">Submit request</span>
       </DbSlot>
 
-      <div class="cta">
-        <div class="cta-copy">
-          <h2 class="h2">Planning something? Let's talk.</h2>
-          <p>Questions before you request? We're happy to help you find the right space.</p>
-        </div>
-        <div class="actions">
-          <a href={`${SITE}/contact-us`} class="btn btn-lg btn-coral">Contact us</a>
-          <a href="/faqs" class="btn btn-lg btn-secondary">Rental FAQs</a>
-        </div>
-      </div>
+    </div>
+  </section>
+
+  <MissionNote />
+
+  <section>
+    <div class="container">
+      <NextSteps title="Not ready to book yet?" lead="Come see the space first, or ask us anything. We're happy to help you find the right room." />
     </div>
   </section>
 </Layout>
