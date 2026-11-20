@@ -48,6 +48,11 @@ GRANT EXECUTE ON FUNCTION public.current_staff_role() TO anon, authenticated;
 -- Visitors (anon) and logins that are not linked to staff see nothing.
 ALTER TABLE staff ENABLE ROW LEVEL SECURITY;
 
+-- Newer Supabase projects do not let the API roles read tables by default.
+-- Signed-in users need SELECT on staff so the app can look up their role;
+-- the policy below still limits which rows they get.
+GRANT SELECT ON staff TO authenticated;
+
 DROP POLICY IF EXISTS staff_read_by_staff ON staff;
 CREATE POLICY staff_read_by_staff ON staff
   FOR SELECT TO authenticated
@@ -62,6 +67,11 @@ CREATE POLICY staff_read_by_staff ON staff
 -- RLS for each table. Patterns to adapt:
 --
 --   ALTER TABLE update_request ENABLE ROW LEVEL SECURITY;
+--
+--   -- This project does not grant table access to the API roles by
+--   -- default, so grant what each role needs, then let policies narrow it:
+--   GRANT SELECT, INSERT ON update_request TO authenticated;
+--   GRANT SELECT ON content_item, web_page TO anon, authenticated;
 --
 --   -- Read: the submitter, or the owner of the related content item.
 --   CREATE POLICY ... ON update_request FOR SELECT TO authenticated

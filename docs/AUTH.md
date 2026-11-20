@@ -97,6 +97,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 **5. Add RLS to your own tables.** `01_auth_setup.sql` only protects `staff`. Until you add policies, the rest of your tables can be read and changed by anyone holding the public key. The bottom of that file has example policies built on `current_staff_id()` and `current_staff_role()`.
 
+This project's tables start with **no API access**: a query returns `permission denied for table …` until you `GRANT` it. Grant only what each role needs (for example `GRANT SELECT, INSERT ON update_request TO authenticated;`), then use RLS policies to narrow it to the right rows.
+
 **6. Joins with supabase-js:** `update_request` has two foreign keys to `staff`, so name the column when you embed, for example `submitter:staff!submitted_by_staff_id(full_name)`.
 
 **7. Two changes that must happen together** (approve the request *and* update the content item, like Operation 10) can be put in a Postgres function and called with `locals.supabase.rpc('function_name', {...})`, so both succeed or neither does.
