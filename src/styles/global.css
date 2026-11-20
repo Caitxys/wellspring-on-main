@@ -308,3 +308,29 @@ a:focus-visible, button:focus-visible {
   .page-hero h1 { font-size: 34px; line-height: 42px; }
   .db-slot { padding: 20px 16px; }
 }
+
+/* Rental search bar at the top of the home page (main call to action) */
+.rental-search { background: #fff; border-bottom: 1px solid var(--line); }
+.rental-search .container { padding-top: 24px; padding-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
+.rental-search-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.rs-field { flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.rs-type { flex-grow: 2; }
+.rs-guests { flex: 0 1 140px; }
+.rs-field label { font-size: 15px; font-weight: 600; color: var(--ink); }
+.rs-field select, .rs-field input {
+  height: 48px; width: 100%; padding: 0 14px; border: 1px solid var(--line-2); border-radius: 8px;
+  background: #fff; color: var(--ink); font: inherit; font-size: 16px;
+}
+.rs-field select:focus-visible, .rs-field input:focus-visible {
+  outline: none; border-color: var(--teal-500); box-shadow: 0 0 0 3px var(--teal-100);
+}
+.rs-submit { flex: 0 0 auto; border: 0; cursor: pointer; justify-content: center; }
+.rs-submit:hover { background: var(--coral-300); }
+.rs-note { margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-3); }
+.rs-tag { display: inline-block; margin-right: 8px; background: var(--coral-100); color: var(--coral-700); }
+.rs-note code { background: var(--gray-100); border-radius: 4px; padding: 1px 5px; }
+@media (max-width: 640px) {
+  .rental-search .container { padding-top: 20px; padding-left: 16px; padding-right: 16px; }
+  .rs-guests { flex-basis: 100%; }
+  .rs-submit { width: 100%; }
+}

@@ -25,6 +25,7 @@ The two groups use separate databases today. They will be joined later.
 
 | Part | Comes from |
 |---|---|
+| Rental search bar (top of page: event type, date, guests) | Events group: checks open dates and room capacity from `room` and `event`. For now it only opens the request form on Rental options |
 | Hero, quick facts, "Ways to engage" cards, testimonial, contact box | Static |
 | Event type chips | Static for now. Same list as Rental options, kept in `src/lib/event-types.ts` to match the Events group's `event.e_type` |
 

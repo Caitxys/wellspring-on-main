@@ -7,6 +7,36 @@ const SITE = 'https://www.wellspringonmain.org';
 ---
 
 <Layout title="Wellspring on Main — Home">
+  <!-- Rental search: the main call to action. Placeholder for the Events
+       group's availability check (room + event tables). For now it only
+       opens the request form on Rental options; it runs no query. -->
+  <section aria-label="Find a space for your event" class="rental-search">
+    <div class="container">
+      <form action="/event-rentals#request" method="get" class="rental-search-form">
+        <div class="rs-field rs-type">
+          <label for="rs-type">Event type</label>
+          <select id="rs-type" name="type">
+            <option value="">Any type of event</option>
+            {eventTypes.map((t) => <option>{t}</option>)}
+          </select>
+        </div>
+        <div class="rs-field">
+          <label for="rs-date">Event date</label>
+          <input id="rs-date" name="date" type="date" />
+        </div>
+        <div class="rs-field rs-guests">
+          <label for="rs-guests">Guests</label>
+          <input id="rs-guests" name="guests" type="number" min="1" inputmode="numeric" placeholder="e.g. 80" />
+        </div>
+        <button type="submit" class="btn btn-lg btn-coral rs-submit">Check availability</button>
+      </form>
+      <p class="rs-note">
+        <span class="db-slot-tag rs-tag">Placeholder · Events group</span>
+        Will check open dates and room capacity from the <code>room</code> and <code>event</code> tables. For now it opens the request form.
+      </p>
+    </div>
+  </section>
+
   <!-- Hero -->
   <section id="top" class="hero">
     <div class="container">
