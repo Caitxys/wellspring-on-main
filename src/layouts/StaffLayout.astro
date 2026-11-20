@@ -1,0 +1,44 @@
+---
+// Minimal shell for staff pages. Placeholder styling — replace with your design.
+import '../styles/global.css';
+import '../styles/staff.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const staff = Astro.locals.staff;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title} · Wellspring Staff</title>
+  </head>
+  <body class="staff">
+    <header class="staff-header">
+      <div class="staff-wrap staff-header-row">
+        <a href={staff ? '/staff' : '/'} class="staff-brand">Wellspring on Main · Staff</a>
+        {
+          staff && (
+            <div class="who">
+              <span>
+                {staff.full_name} <span class="role-tag">{staff.role}</span>
+              </span>
+              <form method="post" action="/api/auth/logout">
+                <button type="submit" class="btn btn-secondary btn-sm">Sign out</button>
+              </form>
+            </div>
+          )
+        }
+      </div>
+    </header>
+    <main class="staff-wrap staff-main">
+      <slot />
+    </main>
+  </body>
+</html>

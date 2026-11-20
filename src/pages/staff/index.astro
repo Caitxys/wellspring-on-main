@@ -1,0 +1,61 @@
+---
+import StaffLayout from '../../layouts/StaffLayout.astro';
+import { PERMISSIONS, can, permissionsFor } from '../../lib/auth';
+import { requireStaffPage } from '../../lib/page-guard';
+
+export const prerender = false;
+
+// Protected page: signed-out visitors are redirected to /login.
+const staff = requireStaffPage(Astro);
+if (staff instanceof Response) return staff;
+
+const mine = permissionsFor(staff);
+---
+
+<StaffLayout title="Staff home">
+  <h1>Welcome, {staff.full_name}</h1>
+  <p>You are signed in as <strong>{staff.role}</strong>.</p>
+
+  <section class="panel">
+    <h2>What your role allows</h2>
+    <ul>
+      {
+        (Object.keys(PERMISSIONS) as (keyof typeof PERMISSIONS)[]).map((p) => (
+          <li>
+            {mine.includes(p) ? '✔' : '✘'} <code>{p}</code>
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      These come from <code>src/lib/auth.ts</code>. The server checks them on every protected request, so hiding a
+      link is never the only protection.
+    </p>
+  </section>
+
+  <!--
+    Your tasks: links to the feature pages, shown by role.
+    These pages are built by the team (see docs/FEATURE-GUIDE.md). Until a page
+    file exists, its link shows "404 Not Found". That is expected.
+    Hiding a link is NOT protection: each page and API route checks again.
+  -->
+  <section class="panel">
+    <h2>Your tasks</h2>
+    <ul class="task-list">
+      {
+        can(staff, 'submit_request') && (
+          <>
+            <li><a href="/staff/requests/new">Submit an update request</a></li>
+            <li><a href="/staff/requests">My update requests</a></li>
+          </>
+        )
+      }
+      {
+        can(staff, 'review_request') && (
+          <li><a href="/staff/requests?status=pending">Review queue (pending requests for my content)</a></li>
+        )
+      }
+      {can(staff, 'view_all_requests') && <li><a href="/staff/requests">All update requests</a></li>}
+    </ul>
+  </section>
+</StaffLayout>
