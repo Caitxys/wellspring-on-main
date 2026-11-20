@@ -8,13 +8,12 @@
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
 import DbSlot from '../components/DbSlot.astro';
+import { eventTypes } from '../lib/event-types';
 
 const SITE = 'https://www.wellspringonmain.org';
 
 const amenities = ['[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]'];
 
-// The Events group's allowed event types (event.e_type), shown with friendly labels.
-const eventTypes = ['Weddings', 'Birthday parties', 'Corporate events', 'Community events', 'Nonprofit events', 'Other gatherings'];
 ---
 
 <Layout title="Rental options · Wellspring on Main">

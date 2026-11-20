@@ -26,7 +26,7 @@ The two groups use separate databases today. They will be joined later.
 | Part | Comes from |
 |---|---|
 | Hero, quick facts, "Ways to engage" cards, testimonial, contact box | Static |
-| Event type chips | Static for now. Should match the Events group's event types (see "Things to line up" below) |
+| Event type chips | Static for now. Same list as Rental options, kept in `src/lib/event-types.ts` to match the Events group's `event.e_type` |
 
 ### About (`/about`)
 
@@ -87,6 +87,6 @@ Sign-in and roles are shared. The update-request screens belong to the Content &
 | Staff | `staff` table, linked to sign-in | `coordinator` table, not linked to sign-in | Keep one list of staff. Coordinators are staff |
 | Roles | `staff.role` text, checked in `src/lib/auth.ts` | `roles` + `user_roles` tables | Pick one way to store roles |
 | Room capacity | Written inside rental text | `room.r_capacity` | Capacity comes from `room` only |
-| Event types | Home page chips (Weddings, Retreats, Conferences, …) | `event.e_type` (wedding, birthday party, corporate, community, non-profit, other) | One list, used by both the site and the form |
+| Event types | A copy of the Events group's list in `src/lib/event-types.ts`, used by the home and Rental options pages | `event.e_type` (wedding, birthday party, corporate, community, non-profit, other) | Read the list from the database so the site and the form can't drift apart |
 | Groups of people | `audience` (Community Members, Nonprofits, Event Renters, Tenants) | `client.c_type` and `event.e_category` | Agree on shared names, or map one to the other |
 | Public events | Programs written as content items | Public events as `event` rows | Decide which one a public event lives in, so it isn't entered twice |
