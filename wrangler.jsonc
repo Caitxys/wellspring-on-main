@@ -1,0 +1,14 @@
+// Cloudflare Workers settings. Used by `npm run deploy` and by Cloudflare's
+// GitHub integration (Workers Builds), which runs `npm run build` and then
+// `npx wrangler deploy`.
+{
+  "name": "wellspring-on-main",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2026-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": { "enabled": true }
+}

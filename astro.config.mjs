@@ -1,9 +1,10 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
 
-// Pages are prerendered (static) by default. Add `export const prerender = false`
-// to any page or API route that needs to run on the Node server (e.g. Supabase writes).
+// Runs on Cloudflare Workers. Pages are prerendered (static) by default.
+// Add `export const prerender = false` to any page or API route that needs
+// the server (sign-in, Supabase queries, form handling).
 export default defineConfig({
-  adapter: node({ mode: 'standalone' }),
+  adapter: cloudflare({ imageService: 'compile' }),
 });

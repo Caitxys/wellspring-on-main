@@ -55,3 +55,8 @@ coverage/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---------- Cloudflare (wrangler) ----------
+.wrangler/
+.dev.vars
+.dev.vars.*
