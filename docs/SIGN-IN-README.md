@@ -2,7 +2,7 @@
 
 This guide explains how staff sign-in was added to the Wellspring site, and how to set it up again yourself, step by step. You don't need a programming background. If you can copy and paste, follow a numbered list and use a website dashboard, you can do this.
 
-For the technical version, see [AUTH.md](AUTH.md).
+For the technical version, see [AUTH.md](AUTH.md). Once sign-in works, build the Assignment 7 feature with [FEATURE-GUIDE.md](FEATURE-GUIDE.md).
 
 ---
 

@@ -72,6 +72,8 @@ These are the same kind of "direct request" checks the Assignment 7 README asks 
 
 ## Hints for building your feature
 
+For a step-by-step walkthrough of the whole update-request workflow, with tested code and troubleshooting, see [FEATURE-GUIDE.md](FEATURE-GUIDE.md).
+
 **1. Decide the rules first.** Write down, per role, who can create, read, and update each record. Then edit `PERMISSIONS` in `src/lib/auth.ts` to match.
 
 **2. Every protected API route follows the same order:**
