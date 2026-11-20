@@ -1,0 +1,41 @@
+---
+// Gallery. Fully static: the team's database has no table for images.
+// Put real photos in public/images/ and swap each placeholder for an <img>
+// with a short alt text that describes the photo.
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+
+const groups = [
+  { title: 'Events', tones: ['', 'tone-teal-dark', 'tone-coral', 'tone-gray', 'tone-coral', 'tone-gray', '', 'tone-teal-dark'] },
+  { title: 'Our spaces', tones: ['tone-gray', '', 'tone-coral', 'tone-teal-dark'] },
+  { title: 'Community', tones: ['tone-coral', 'tone-teal-dark', '', 'tone-gray'] },
+];
+---
+
+<Layout title="Gallery · Wellspring on Main">
+  <PageHero
+    eyebrow="Gallery"
+    title="Moments at the well"
+    lead="Celebrations, workshops and neighbors coming together at 201 W. Main St."
+  />
+
+  {
+    groups.map((g) => (
+      <section class="gallery-group">
+        <div class="container stack">
+          <h2 class="h2">{g.title}</h2>
+          <div class="photo-grid">
+            {g.tones.map((tone) => (
+              <figure>
+                <div role="img" aria-label={`Photo placeholder: ${g.title.toLowerCase()}`} class={`placeholder ${tone}`}>
+                  [Photo]
+                </div>
+                <figcaption>[Caption]</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+</Layout>

@@ -1,0 +1,95 @@
+---
+// Programs + Projects. Static: intro, featured project, ways to get involved.
+// Content & Community group: program listings and their audiences (content_item).
+// Events group: upcoming public events (event table).
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import DbSlot from '../components/DbSlot.astro';
+
+const SITE = 'https://www.wellspringonmain.org';
+---
+
+<Layout title="Programs + Projects · Wellspring on Main">
+  <PageHero
+    eyebrow="Programs + Projects"
+    title="Projects shaped with and for Arlington"
+    lead="Classes, workshops and community projects for neighbors of every age."
+  />
+
+  <section>
+    <div class="container two-col">
+      <div role="img" aria-label="Photo placeholder: community members in conversation" class="placeholder tone-coral feature-photo">
+        [Photo: community conversation]
+      </div>
+      <div class="col-body">
+        <span class="eyebrow">Featured project</span>
+        <h2 class="h2">Gathering at the Wellspring: A Vision for Arlington's Future</h2>
+        <p>Our first project invites the community to imagine what comes next for Downtown Arlington.</p>
+        <p>[Placeholder: how to take part and key dates.]</p>
+        <a href={`${SITE}/projects-1`} class="text-link">Learn about the project →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-gray">
+    <div class="container stack">
+      <DbSlot
+        group="content"
+        title="Current programs"
+        source="content_item on /programs"
+        note="One card per program, with its audiences. Show items that are published and not archived. An audience filter would fit here."
+      >
+        <ul class="chips" aria-label="Audience filter (sample)">
+          <li>All</li>
+          <li>[Audience]</li>
+          <li>[Audience]</li>
+          <li>[Audience]</li>
+        </ul>
+        <div class="sample-grid">
+          {
+            [1, 2, 3].map(() => (
+              <div class="sample-card">
+                <span class="sample-tag">[Audience]</span>
+                <h3>[Program title]</h3>
+                <p>[Description and schedule]</p>
+              </div>
+            ))
+          }
+        </div>
+      </DbSlot>
+
+      <DbSlot
+        group="events"
+        title="Upcoming public events"
+        source="event + room tables"
+        note="Events whose category is public, status is scheduled and not archived, starting today or later. Show only the event name, date and time, and room name. Never show client or contact details."
+      >
+        <div class="sample-grid">
+          {
+            [1, 2, 3].map(() => (
+              <div class="sample-card">
+                <span class="sample-tag">[Date and time]</span>
+                <h3>[Event name]</h3>
+                <p>[Room name]</p>
+              </div>
+            ))
+          }
+        </div>
+      </DbSlot>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="cta">
+        <div class="cta-copy">
+          <h2 class="h2">Roll up your sleeves</h2>
+          <p>Hands-on ways to care for downtown and connect with your neighbors.</p>
+        </div>
+        <div class="actions">
+          <a href={`${SITE}/general-clean`} class="btn btn-lg btn-coral">Get involved</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

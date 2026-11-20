@@ -1,0 +1,129 @@
+---
+// Rental options. Most of this page will come from the Events group:
+//   - the rooms and their capacity (room table)
+//   - the event types (the allowed values of event.e_type)
+//   - the event request form (saves a client and an event row)
+// Content & Community group: rates text that staff edit (content_item).
+// Static: photos, amenities and the contact call to action.
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import DbSlot from '../components/DbSlot.astro';
+import { eventTypes } from '../lib/event-types';
+
+const SITE = 'https://www.wellspringonmain.org';
+
+const amenities = ['[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]', '[Amenity]'];
+
+---
+
+<Layout title="Rental options · Wellspring on Main">
+  <PageHero
+    eyebrow="Rental options"
+    title="Room for every kind of gathering"
+    lead="Customizable spaces with professional amenities and a warm atmosphere for events of every size."
+  >
+    <div class="actions">
+      <a href="#request" class="btn btn-lg btn-primary">Request your event</a>
+      <a href={`${SITE}/contact-us`} class="btn btn-lg btn-secondary">Contact us</a>
+    </div>
+  </PageHero>
+
+  <section>
+    <div class="container stack">
+      <DbSlot
+        group="events"
+        title="Our spaces"
+        source="room table"
+        note="One card per room: name and capacity. Show rooms whose status is Available. Photos stay static and are matched to each room by name."
+      >
+        <div class="card-grid">
+          {
+            ['', 'tone-coral', 'tone-gray'].map((tone) => (
+              <article class="card">
+                <div role="img" aria-label="Photo placeholder: rental space" class={`placeholder ${tone}`}>
+                  [Photo: space]
+                </div>
+                <div class="card-body">
+                  <h3>[Room name]</h3>
+                  <p>Up to [capacity] guests</p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </DbSlot>
+    </div>
+  </section>
+
+  <section class="band-gray">
+    <div class="container stack">
+      <DbSlot
+        group="content"
+        title="Rates"
+        source="content_item on /event-rentals"
+        note="Prices change, so staff keep them up to date through update requests. Show items that are published and not archived. Capacity comes from the room table above, not from this text."
+      >
+        <div class="sample-grid">
+          <div class="sample-card"><h3>[Content title]</h3><p>[Rates text]</p></div>
+          <div class="sample-card"><h3>[Content title]</h3><p>[Rates text]</p></div>
+        </div>
+      </DbSlot>
+    </div>
+  </section>
+
+  <section>
+    <div class="container stack">
+      <div class="section-head">
+        <h2 class="h2">Included with every rental</h2>
+      </div>
+      <ul class="check-list">
+        {amenities.map((a) => <li>{a}</li>)}
+      </ul>
+
+      <DbSlot
+        group="events"
+        title="Events we host"
+        source="event.e_type allowed values"
+        note="Keep this list the same as the event types the request form accepts, so the site never advertises a type that can't be booked."
+      >
+        <ul aria-label="Event types" class="chips">
+          {eventTypes.map((t) => <li>{t}</li>)}
+        </ul>
+      </DbSlot>
+    </div>
+  </section>
+
+  <section id="request" class="band-gray">
+    <div class="container stack">
+      <DbSlot
+        group="events"
+        title="Request your event"
+        source="client + event tables"
+        note="The Events group's request form. It saves the requester as a client and the request as an event with status 'submitted' for a coordinator to review. Visitors never see other people's requests."
+      >
+        <ul class="sample-fields">
+          <li>Your name, email and phone</li>
+          <li>Event name and type</li>
+          <li>Category (public, private, tenant)</li>
+          <li>Start and end time</li>
+          <li>Expected attendance</li>
+          <li>Preferred room</li>
+          <li>Furniture and technology</li>
+          <li>Catering and notes</li>
+        </ul>
+        <span class="btn btn-primary sample-btn" aria-hidden="true">Submit request</span>
+      </DbSlot>
+
+      <div class="cta">
+        <div class="cta-copy">
+          <h2 class="h2">Planning something? Let's talk.</h2>
+          <p>Questions before you request? We're happy to help you find the right space.</p>
+        </div>
+        <div class="actions">
+          <a href={`${SITE}/contact-us`} class="btn btn-lg btn-coral">Contact us</a>
+          <a href="/faqs" class="btn btn-lg btn-secondary">Rental FAQs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

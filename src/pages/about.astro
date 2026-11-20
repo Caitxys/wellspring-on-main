@@ -1,0 +1,93 @@
+---
+// About page. Static: story, who runs Wellspring, visiting info.
+// Content & Community group: mission and announcements (content_item).
+// Events group: tour requests (inquiry).
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import DbSlot from '../components/DbSlot.astro';
+
+const SITE = 'https://www.wellspringonmain.org';
+---
+
+<Layout title="About · Wellspring on Main">
+  <PageHero
+    eyebrow="About Wellspring"
+    title="A place to draw from, and to give back to."
+    lead="Wellspring on Main is a gathering place in the middle of Downtown Arlington, run by the Arlington Center for Community Engagement, Inc."
+  />
+
+  <section>
+    <div class="container two-col">
+      <div class="col-head">
+        <h2 class="h2">Our story</h2>
+      </div>
+      <div class="col-body">
+        <p>
+          For generations, the village well has been where people meet, share news and look after one another. We
+          are building that same kind of place at 201 W. Main St.
+        </p>
+        <p>[Placeholder: a short history of the building and how Wellspring began.]</p>
+        <p>[Placeholder: the people and partners behind Wellspring.]</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-gray">
+    <div class="container stack">
+      <DbSlot
+        group="content"
+        title="Our mission"
+        source="content_item on /"
+        note="The mission is stored on the Home page record. Show it only when it is published and not archived."
+      >
+        <div class="sample-card">
+          <h3>[Content title]</h3>
+          <p>[Content body]</p>
+        </div>
+      </DbSlot>
+
+      <DbSlot
+        group="content"
+        title="Announcements"
+        source="content_item on /"
+        note="Short notices such as holiday hours. Same rule: published and not archived."
+      >
+        <div class="sample-grid">
+          <div class="sample-card"><h3>[Announcement title]</h3><p>[Announcement body]</p></div>
+          <div class="sample-card"><h3>[Announcement title]</h3><p>[Announcement body]</p></div>
+        </div>
+      </DbSlot>
+
+      <DbSlot
+        group="events"
+        title="Request a tour"
+        source="client + inquiry tables (i_type = 'tour')"
+        note="A short form that saves the visitor as a client and the tour request as an inquiry for a coordinator to follow up."
+      >
+        <ul class="sample-fields">
+          <li>Name</li>
+          <li>Email</li>
+          <li>Phone</li>
+          <li>Group size and preferred dates</li>
+        </ul>
+        <span class="btn btn-primary sample-btn" aria-hidden="true">Request a tour</span>
+      </DbSlot>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="cta">
+        <div class="cta-copy">
+          <h2 class="h2">Visit us</h2>
+          <p>201 W. Main St., Downtown Arlington, Texas</p>
+          <p>[Placeholder: opening hours and parking.]</p>
+        </div>
+        <div class="actions">
+          <a href={`${SITE}/contact-us`} class="btn btn-lg btn-coral">Contact us</a>
+          <a href="https://www.google.com/maps/search/?api=1&query=201+W+Main+St+Arlington+TX" class="btn btn-lg btn-secondary">Get directions</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

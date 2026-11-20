@@ -1,0 +1,31 @@
+---
+// A clearly marked placeholder for content or a feature that will come from
+// one of the two team databases. It shows sample layout only and runs no query.
+// Replace the whole <DbSlot> with the real thing when it is connected.
+//
+//   group="content"  Content & Community group (staff, web_page, content_item, ...)
+//   group="events"   Events group (room, event, inquiry, client, coordinator)
+//
+// See docs/SITE-DATA-MAP.md for the full map.
+interface Props {
+  group: 'content' | 'events';
+  title: string;
+  /** Where it comes from, e.g. "content_item on /programs" or "room table" */
+  source: string;
+  /** Plain-language note on what to show */
+  note: string;
+}
+const { group, title, source, note } = Astro.props;
+const groupName = group === 'events' ? 'Events group' : 'Content & Community group';
+---
+
+<section class={`db-slot db-slot-${group}`} aria-label={`${title} (placeholder from the ${groupName})`}>
+  <div class="db-slot-head">
+    <span class="db-slot-tag">Placeholder · {groupName}</span>
+    <h2 class="db-slot-title">{title}</h2>
+    <p class="db-slot-note">
+      From <code>{source}</code>. {note}
+    </p>
+  </div>
+  <slot />
+</section>

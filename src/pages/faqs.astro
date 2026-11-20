@@ -1,0 +1,66 @@
+---
+// FAQs. The questions are static for now. Later, each could become a content
+// item (title = question, body = answer) on its own web_page, so answers are
+// owned and reviewed like other content.
+// Events group: the "Ask a question" form (inquiry).
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import DbSlot from '../components/DbSlot.astro';
+
+const groups = [
+  {
+    title: 'Renting a space',
+    items: [
+      'How do I book a space?',
+      'How far ahead should I book?',
+      'Can I bring my own caterer?',
+      'Is there a deposit?',
+    ],
+  },
+  {
+    title: 'Programs and projects',
+    items: ['How do I sign up for a program?', 'Do programs cost anything?', 'Can my organization partner with Wellspring?'],
+  },
+  {
+    title: 'Visiting',
+    items: ['Where do I park?', 'Is the building accessible?', 'What are your hours?'],
+  },
+];
+---
+
+<Layout title="FAQs · Wellspring on Main">
+  <PageHero eyebrow="FAQs" title="Questions and answers" lead="Quick answers about renting, programs and visiting Wellspring." />
+
+  <section>
+    <div class="container faq-wrap">
+      {
+        groups.map((g) => (
+          <div class="faq-group">
+            <h2 class="h2">{g.title}</h2>
+            {g.items.map((q) => (
+              <details class="faq">
+                <summary>{q}</summary>
+                <p>[Placeholder answer.]</p>
+              </details>
+            ))}
+          </div>
+        ))
+      }
+
+      <DbSlot
+        group="events"
+        title="Still have a question?"
+        source="client + inquiry tables"
+        note="A short form that saves the visitor as a client and the question as an inquiry (general info, tour, spaces or donation) for a coordinator to answer."
+      >
+        <ul class="sample-fields">
+          <li>Name, email and phone</li>
+          <li>Topic (general info, tour, spaces, donation)</li>
+          <li>Subject</li>
+          <li>Your question</li>
+        </ul>
+        <span class="btn btn-primary sample-btn" aria-hidden="true">Send question</span>
+      </DbSlot>
+    </div>
+  </section>
+</Layout>

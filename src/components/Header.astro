@@ -1,5 +1,13 @@
 ---
 const SITE = 'https://www.wellspringonmain.org';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { label: 'About', href: '/about' },
+  { label: 'Rental options', href: '/event-rentals' },
+  { label: 'Programs + Projects', href: '/programs' },
+  { label: 'Gallery', href: '/gallery' },
+  { label: 'FAQs', href: '/faqs' },
+];
 ---
 
 <div class="utility">
@@ -28,12 +36,8 @@ const SITE = 'https://www.wellspringonmain.org';
       </span>
     </a>
     <nav aria-label="Main" class="main-nav">
-      <a href="/#about">About</a>
-      <a href="/#rentals">Rental options</a>
-      <a href="/#programs">Programs + Projects</a>
-      <a href={`${SITE}/gallery`}>Gallery</a>
-      <a href={`${SITE}/faqs`}>FAQs</a>
-      <a href={`${SITE}/contact-us`} class="btn btn-primary">Book a space</a>
+      {nav.map((n) => <a href={n.href} aria-current={path === n.href ? 'page' : undefined}>{n.label}</a>)}
+      <a href="/event-rentals#request" class="btn btn-primary">Book a space</a>
     </nav>
   </div>
 </header>
