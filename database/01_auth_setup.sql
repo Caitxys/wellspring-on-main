@@ -1,7 +1,7 @@
 -- =====================================================================
 -- 01_auth_setup.sql — connect Supabase Auth logins to the staff table
 -- =====================================================================
--- Run in the Supabase SQL Editor AFTER your Assignment 4 tables exist.
+-- Run in the Supabase SQL Editor AFTER your team's tables exist.
 -- Safe to run more than once. It does not change your other tables.
 --
 -- What it does:

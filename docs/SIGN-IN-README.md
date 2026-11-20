@@ -2,7 +2,7 @@
 
 This guide explains how staff sign-in was added to the Wellspring site, and how to set it up again yourself, step by step. You don't need a programming background. If you can copy and paste, follow a numbered list and use a website dashboard, you can do this.
 
-For the technical version, see [AUTH.md](AUTH.md). Once sign-in works, build the Assignment 7 feature with [FEATURE-GUIDE.md](FEATURE-GUIDE.md).
+For the technical version, see [AUTH.md](AUTH.md). Once sign-in works, build the update-request feature with [FEATURE-GUIDE.md](FEATURE-GUIDE.md).
 
 ---
 
@@ -32,7 +32,7 @@ Your role always comes from the staff list in the database. It never comes from 
 | **VS Code** (or any text editor) | Lets you edit one settings file | https://code.visualstudio.com |
 | Access to the team's **GitHub repository** | Holds the code | https://github.com/Caitxys/wellspring-on-main |
 | Access to the team's **Supabase project** | Holds the database and the logins | https://supabase.com/dashboard |
-| The team's tables already created in Supabase | The setup adds sign-in to the existing `staff` table | From Assignment 4 |
+| The team's tables already created in Supabase | The setup adds sign-in to the existing `staff` table | Your team's database SQL file |
 
 To check that Node.js is installed, open the **Terminal** (Mac) or **Command Prompt** (Windows) and type:
 

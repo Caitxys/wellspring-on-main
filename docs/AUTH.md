@@ -1,6 +1,6 @@
 # Sign-in and roles: starter guide
 
-This branch adds **authentication** (who is signed in) and **authorization** (what their role allows) to the Astro + Supabase project. The Assignment 7 feature itself is yours to build: the update-request workflow, its pages, validation, and Row Level Security for your tables. The hints at the end show where to start.
+This branch adds **authentication** (who is signed in) and **authorization** (what their role allows) to the Astro + Supabase project. The feature itself is yours to build: the update-request workflow, its pages, validation, and Row Level Security for your tables. The hints at the end show where to start.
 
 New to this? Start with the plain-language walkthrough in [SIGN-IN-README.md](SIGN-IN-README.md).
 
@@ -21,7 +21,7 @@ New to this? Start with the plain-language walkthrough in [SIGN-IN-README.md](SI
 | `src/pages/api/me.ts` | Example protected API route |
 | `src/pages/api/examples/review-check.ts` | Example role-restricted API route (copy the pattern, then delete it) |
 
-There's no registration page. Accounts are created in the Supabase dashboard, which the assignment allows.
+There's no registration page. Accounts are created in the Supabase dashboard; a custom registration system isn't needed.
 
 ## Setup
 
@@ -68,7 +68,7 @@ fetch('/api/examples/review-check', { method: 'POST' })
 | Maya (Programs Lead) | 200 | 403 |
 | Jordan (Content Owner) | 200 | 200 |
 
-These are the same kind of "direct request" checks the Assignment 7 README asks for.
+These are the same kind of "direct request" checks your README needs to include.
 
 ## Hints for building your feature
 
@@ -99,9 +99,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 **4. Protected pages:** start with `const staff = requireStaffPage(Astro); if (staff instanceof Response) return staff;`. Use `can(staff, '...')` to choose what to show, and remember the API route must check again.
 
-**5. Add RLS to your own tables.** `01_auth_setup.sql` only protects `staff`. Until you add policies, the rest of your tables can be read and changed by anyone holding the public key. The bottom of that file has example policies built on `current_staff_id()` and `current_staff_role()`.
-
-This project's tables start with **no API access**: a query returns `permission denied for table …` until you `GRANT` it. Grant only what each role needs (for example `GRANT SELECT, INSERT ON update_request TO authenticated;`), then use RLS policies to narrow it to the right rows.
+**5. Add access rules to your own tables.** `01_auth_setup.sql` only protects `staff`. Your other tables start with **no API access**: a query returns `permission denied for table …` until you `GRANT` it. Grant only what each role needs, then use RLS policies to narrow it to the right rows. Step 1 of [FEATURE-GUIDE.md](FEATURE-GUIDE.md) has a tested `03_feature_access.sql` that does both for the update-request workflow.
 
 **6. Joins with supabase-js:** `update_request` has two foreign keys to `staff`, so name the column when you embed, for example `submitter:staff!submitted_by_staff_id(full_name)`.
 

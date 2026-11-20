@@ -1,16 +1,16 @@
-# Assignment 7 Build Guide: The Update-Request Workflow
+# Feature Build Guide: The Update-Request Workflow
 
-This guide walks your team through finishing the Assignment 7 feature on top of the sign-in and roles starter. Work through it in order. Each step says **what** you're building, **why** it's needed for grading, **what to do** and **how to check** that it works before you move on.
+This guide walks your team through building the update-request feature on top of the sign-in and roles starter. Work through it in order. Each step says **what** you're building, **why** it's needed, **what to do** and **how to check** that it works before you move on.
 
 > **Before you start:** sign-in must already work. If it doesn't, finish [SIGN-IN-README.md](SIGN-IN-README.md) first.
 >
-> **Due:** Nov 20, 11:59 PM Central. Get the required pieces working first. Polish comes last.
+> Get the required pieces working first. Polish comes last.
 
 ---
 
 ## The feature in one paragraph
 
-A **Programs Lead** or **Events Lead** submits a request to change a piece of website content (for example, a new workshop time). The **Content Owner** of that item sees it in their review queue, edits the website text and approves or rejects it. The **Executive Director** can see every request. This is the same workflow as your Assignment 6 prototype.
+A **Programs Lead** or **Events Lead** submits a request to change a piece of website content (for example, a new workshop time). The **Content Owner** of that item sees it in their review queue, edits the website text and approves or rejects it. The **Executive Director** can see every request. This is the same workflow as your clickable prototype (`index.html` in the main folder).
 
 ## How each requirement is covered
 
@@ -154,7 +154,7 @@ SELECT tablename, policyname FROM pg_policies WHERE schemaname = 'public' ORDER 
 
 You should see 9 rules across 6 tables: the 8 created above, plus `staff_read_by_staff` from file 01.
 
-These rules were tested against your Assignment 4 schema and sample data before this guide was written. Each person in the table above got exactly the access listed.
+These rules were tested against your team's database schema and sample data before this guide was written. Each person in the table above got exactly the access listed.
 
 ---
 
@@ -269,7 +269,7 @@ You should see **201** and a message like `Request #5 was submitted…`. Run it 
 
 ## Step 3: The submit form (Create, part 2: the page)
 
-**Why:** The grader must be able to create a record **through the interface**. This page shows a form, sends it to the route from Step 2 and shows the success or error message.
+**Why:** Users must be able to create a record **through the interface**, not only by calling the server directly. This page shows a form, sends it to the route from Step 2 and shows the success or error message.
 
 The dropdown lists each content item with the **page it appears on**. That's your first use of related tables (`content_item` → `web_page`).
 
@@ -369,7 +369,7 @@ if (error) console.error('Loading content items failed:', error);
 </script>
 ```
 
-> **Why `novalidate`?** It turns off the browser's own "Please fill out this field" bubbles, so you can see the **server's** validation messages. Those are what the assignment grades.
+> **Why `novalidate`?** It turns off the browser's own "Please fill out this field" bubbles, so you can see the **server's** validation messages. The server's checks are the ones that count, because the browser's can be skipped.
 
 **Check it:** as Maya, open `/staff/requests/new`.
 
@@ -648,7 +648,7 @@ To see a **403**, run the same code while signed in as **Maya** (wrong role) or 
 
 ## Step 6: The request detail page with the review form (Update, part 2: the page)
 
-**Why:** The grader must be able to update a record **through the interface** and see that the change stays after a reload. This page shows everything about one request, pulled from four tables, and, for the item's owner only, the review form.
+**Why:** Users must be able to update a record **through the interface** and see that the change stays after a reload. This page shows everything about one request, pulled from four tables, and, for the item's owner only, the review form.
 
 **Do this:** create `src/pages/staff/requests/[id].astro`:
 
@@ -780,7 +780,7 @@ const canReview =
 
 ## Step 7: The two direct checks the README must include
 
-The assignment asks you to send requests **directly to the server**, skipping the form, to prove the server protects itself. Paste these into the browser console.
+Your README must show how to send requests **directly to the server**, skipping the form, to prove the server protects itself. Paste these into the browser console.
 
 **Check A: invalid input is rejected (validation).** Sign in as **Maya** and run:
 
@@ -820,11 +820,11 @@ Afterwards, sign in as Jordan and confirm request 2 is still **pending**.
 ## Step 8: Finish up
 
 - [ ] **Remove the example route** `src/pages/api/examples/review-check.ts` once your real routes work. It was only there to test roles.
-- [ ] **Sample data:** your Assignment 4 SQL already includes fictional data with requests in every status. Include it in the `database/` folder as `00_schema_and_sample_data.sql` (or similar), so the grader can rebuild the database.
-- [ ] **Run order** for the README: `00_…` (your tables and sample data) → create the test logins → `01_auth_setup.sql` → `02_link_test_accounts.sql` → `03_feature_access.sql`.
+- [ ] **Sample data:** your team's database SQL already includes fictional data with requests in every status. Include it in the `database/` folder as `00_schema_and_sample_data.sql` (or similar), so anyone running the project can rebuild the database.
+- [ ] **Run order** for the README: `00_…` (your tables and sample data) → `01_auth_setup.sql` → create the test logins → `02_link_test_accounts.sql` → `03_feature_access.sql`. This matches the order in [SIGN-IN-README.md](SIGN-IN-README.md).
 - [ ] **Run `npx astro check`** in the Terminal. It should say `0 errors`.
 - [ ] **Run `npm run build`.** It should finish without errors.
-- [ ] **Write the README** (template below) and walk through it on a fresh sign-in, as if you were the grader.
+- [ ] **Write the README** (template below) and walk through it on a fresh sign-in, as if you were someone seeing the project for the first time.
 - [ ] **Make sure `.env` is not in your submission** (Git already ignores it) and `.env.example` is.
 
 ---
@@ -884,13 +884,12 @@ Afterwards, sign in as Jordan and confirm request 2 is still **pending**.
 
 ## README template for your submission
 
-Your Assignment 7 `README.md` goes in the main project folder and must use these five headings. Replace everything in [brackets].
+Your `README.md` goes in the main project folder and must use these five headings. Replace everything in [brackets].
 
 ````markdown
 # Wellspring Content Update Requests — [Team name]
 
 **Team:** Caitlin Hartman, Rosa Vargas, Dylan McKoy, Preston Page, Andrew Looney, Hamshini Ananth
-**Assignment:** 7 — Functional Feature
 
 ## 1. Feature summary
 Programs Leads and Events Leads submit requests to update website content. The Content Owner of each item reviews the request, edits the website text, and approves or rejects it. The Executive Director can see every request.
@@ -904,8 +903,8 @@ The feature uses related tables: `update_request` references `content_item` (whi
 
 **Database:** in the Supabase SQL Editor, run in this order:
 1. `database/[00_schema_and_sample_data].sql` — tables and fictional sample data
-2. Create the test accounts (below)
-3. `database/01_auth_setup.sql` — connects logins to staff
+2. `database/01_auth_setup.sql` — prepares the staff table for logins
+3. Create the test accounts (below)
 4. `database/02_link_test_accounts.sql` — links each login to its staff row by email
 5. `database/03_feature_access.sql` — access rules for the feature
 
