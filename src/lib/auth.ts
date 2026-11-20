@@ -16,6 +16,7 @@ export const PERMISSIONS = {
   submit_request: ['Programs Lead', 'Events Lead'],
   review_request: ['Content Owner'],
   view_all_requests: ['Executive Director'],
+  archive_content: ['Content Owner'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type Permission = keyof typeof PERMISSIONS;
