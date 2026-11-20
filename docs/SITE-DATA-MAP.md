@@ -36,7 +36,18 @@ The two groups use separate databases today. They will be joined later.
 | Our story, Visit us | Static |
 | Our mission | Content & Community group: `content_item` on `/` |
 | Announcements (e.g. holiday hours) | Content & Community group: `content_item` on `/` |
-| Request a tour form | Events group: saves a `client` and an `inquiry` with type `tour` |
+| Request a tour form (`/about#tour`) | Events group: saves a `client` and an `inquiry` with type `tour`. Linked from every rental and use-case page |
+
+### Ways to use Wellspring (`/uses` and `/uses/<slug>`)
+
+One overview page plus one page per use case (weddings, celebrations, corporate, nonprofits, community, classes, markets). The copy lives in `src/lib/uses.ts`.
+
+| Part | Comes from |
+|---|---|
+| Intro, ideas, "why it works here", questions, mission note, next steps | Static (`src/lib/uses.ts`). Text in [brackets] still needs real details from Wellspring |
+| Spaces that fit | Events group: `room` table, Available rooms, largest-enough first for the typical guest count |
+| What it costs | Content & Community group: the same rates `content_item` as Rental options, led by a starting price |
+| "Check availability" buttons | Link to `/event-rentals?type=…&guests=…#request`. The Events group's form should fill these in |
 
 ### Rental options (`/event-rentals`)
 
@@ -46,7 +57,7 @@ The two groups use separate databases today. They will be joined later.
 | Rates | Content & Community group: `content_item` on `/event-rentals` |
 | Included with every rental | Static |
 | Events we host | Events group: the allowed values of `event.e_type` |
-| Request your event form | Events group: saves a `client` and an `event` with status `submitted` |
+| Request your event form | Events group: saves a `client` and an `event` with status `submitted`. Should fill in `type`, `date` and `guests` from the link, and ask "How did you hear about us?" |
 
 ### Programs + Projects (`/programs`)
 

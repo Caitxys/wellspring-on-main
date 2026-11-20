@@ -334,3 +334,29 @@ a:focus-visible, button:focus-visible {
   .rs-guests { flex-basis: 100%; }
   .rs-submit { width: 100%; }
 }
+
+/* ---------- Ways to use Wellspring ---------- */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.mini-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.mini-tags li {
+  font-size: 13px; line-height: 18px; padding: 3px 10px; border-radius: 999px;
+  background: var(--teal-50); color: var(--teal-700);
+}
+.related { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.related li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.related a { font-weight: 600; }
+.related span { color: var(--ink-3); }
+
+.mission-note { background: var(--teal-50); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.mission-note .container { padding-top: 40px; padding-bottom: 40px; display: flex; gap: 20px; align-items: flex-start; }
+.mission-note > .container > div { display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+.mission-title { margin: 0; font-size: 22px; line-height: 30px; font-weight: 600; }
+.mission-note p { margin: 0; color: var(--ink-2); line-height: 26px; }
+
+.chips a { color: inherit; text-decoration: none; }
+.chips a:hover { text-decoration: underline; }
+.gallery-cta { align-self: flex-start; }
+.host-prompt { margin: 0; color: var(--ink-2); }

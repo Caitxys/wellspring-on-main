@@ -1,0 +1,60 @@
+---
+// Ways to use Wellspring. Static overview of every use case in src/lib/uses.ts.
+// Helps visitors see uses they hadn't thought of, then sends them to a
+// use-case page or straight to the rental request form.
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import MissionNote from '../../components/MissionNote.astro';
+import NextSteps from '../../components/NextSteps.astro';
+import { useCases } from '../../lib/uses';
+---
+
+<Layout
+  title="Ways to use Wellspring · Wellspring on Main"
+  description="Weddings, birthdays, team offsites, nonprofit meetings, classes and pop-up markets: see how you can use Wellspring on Main's event space in Downtown Arlington."
+>
+  <PageHero
+    eyebrow="Ways to use Wellspring"
+    title="What will you gather for?"
+    lead="Wellspring on Main hosts much more than parties. Find the kind of gathering you're planning, see how it works here, and check if your date is open."
+  >
+    <div class="actions">
+      <a href="/event-rentals#request" class="btn btn-lg btn-primary">Check availability</a>
+      <a href="/about#tour" class="btn btn-lg btn-secondary">Request a tour</a>
+    </div>
+  </PageHero>
+
+  <section>
+    <div class="container">
+      <div class="card-grid">
+        {
+          useCases.map((u) => (
+            <article class="card">
+              <div role="img" aria-label={`Photo placeholder: ${u.name.toLowerCase()}`} class={`placeholder ${u.photoTone}`}>
+                [Photo: {u.name.toLowerCase()}]
+              </div>
+              <div class="card-body">
+                <h3>{u.name}</h3>
+                <p>{u.hook}</p>
+                <ul class="mini-tags" aria-label={`Examples of ${u.name.toLowerCase()}`}>
+                  {u.ideas.slice(0, 3).map((i) => <li>{i}</li>)}
+                </ul>
+                <a href={`/uses/${u.slug}`} class="btn btn-secondary">
+                  See how it works<span class="visually-hidden"> for {u.name.toLowerCase()}</span>
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <MissionNote />
+
+  <section>
+    <div class="container">
+      <NextSteps title="Don't see your event here?" lead="If it brings people together, there's a good chance it fits. Tell us what you have in mind." />
+    </div>
+  </section>
+</Layout>

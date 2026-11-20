@@ -2,17 +2,45 @@
 // Gallery. Fully static: the team's database has no table for images.
 // Put real photos in public/images/ and swap each placeholder for an <img>
 // with a short alt text that describes the photo.
+//
+// Captions do the selling: say what the event was, how many came and which
+// room, e.g. "Nonprofit gala · 90 guests · Main Hall". Each group links to
+// the matching Ways to use page so a visitor can host something similar.
 import Layout from '../layouts/Layout.astro';
 import PageHero from '../components/PageHero.astro';
+import NextSteps from '../components/NextSteps.astro';
+
+const eventCaption = '[Event type] · [Number] guests · [Room name]';
 
 const groups = [
-  { title: 'Events', tones: ['', 'tone-teal-dark', 'tone-coral', 'tone-gray', 'tone-coral', 'tone-gray', '', 'tone-teal-dark'] },
-  { title: 'Our spaces', tones: ['tone-gray', '', 'tone-coral', 'tone-teal-dark'] },
-  { title: 'Community', tones: ['tone-coral', 'tone-teal-dark', '', 'tone-gray'] },
+  {
+    title: 'Events',
+    lead: 'Real gatherings hosted at Wellspring.',
+    caption: eventCaption,
+    tones: ['', 'tone-teal-dark', 'tone-coral', 'tone-gray', 'tone-coral', 'tone-gray', '', 'tone-teal-dark'],
+    cta: { label: 'Host something like this', href: '/uses' },
+  },
+  {
+    title: 'Our spaces',
+    lead: 'The rooms, set up a few different ways.',
+    caption: '[Room name] · [Setup, e.g. banquet, classroom, open] · Up to [capacity] guests',
+    tones: ['tone-gray', '', 'tone-coral', 'tone-teal-dark'],
+    cta: { label: 'Compare rental options', href: '/event-rentals' },
+  },
+  {
+    title: 'Community',
+    lead: 'Programs and projects that happen here.',
+    caption: '[Program or project name] · [Month, year]',
+    tones: ['tone-coral', 'tone-teal-dark', '', 'tone-gray'],
+    cta: { label: 'See programs + projects', href: '/programs' },
+  },
 ];
 ---
 
-<Layout title="Gallery · Wellspring on Main">
+<Layout
+  title="Gallery · Wellspring on Main"
+  description="Photos of weddings, celebrations, meetings and community programs at Wellspring on Main in Downtown Arlington."
+>
   <PageHero
     eyebrow="Gallery"
     title="Moments at the well"
@@ -23,19 +51,29 @@ const groups = [
     groups.map((g) => (
       <section class="gallery-group">
         <div class="container stack">
-          <h2 class="h2">{g.title}</h2>
+          <div class="section-head">
+            <h2 class="h2">{g.title}</h2>
+            <p class="lead">{g.lead}</p>
+          </div>
           <div class="photo-grid">
             {g.tones.map((tone) => (
               <figure>
                 <div role="img" aria-label={`Photo placeholder: ${g.title.toLowerCase()}`} class={`placeholder ${tone}`}>
                   [Photo]
                 </div>
-                <figcaption>[Caption]</figcaption>
+                <figcaption>{g.caption}</figcaption>
               </figure>
             ))}
           </div>
+          <a href={g.cta.href} class="btn btn-secondary gallery-cta">{g.cta.label}</a>
         </div>
       </section>
     ))
   }
+
+  <section>
+    <div class="container">
+      <NextSteps title="Picture your event here?" lead="Check your date, or come see the space in person first." />
+    </div>
+  </section>
 </Layout>
