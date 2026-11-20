@@ -1,0 +1,42 @@
+---
+import StaffLayout from '../../layouts/StaffLayout.astro';
+import { PERMISSIONS, permissionsFor } from '../../lib/auth';
+import { requireStaffPage } from '../../lib/page-guard';
+
+export const prerender = false;
+
+// Protected page: signed-out visitors are redirected to /login.
+const staff = requireStaffPage(Astro);
+if (staff instanceof Response) return staff;
+
+const mine = permissionsFor(staff);
+---
+
+<StaffLayout title="Staff home">
+  <h1>Welcome, {staff.full_name}</h1>
+  <p>You are signed in as <strong>{staff.role}</strong>.</p>
+
+  <section class="panel">
+    <h2>What your role allows</h2>
+    <ul>
+      {
+        (Object.keys(PERMISSIONS) as (keyof typeof PERMISSIONS)[]).map((p) => (
+          <li>
+            {mine.includes(p) ? '✔' : '✘'} <code>{p}</code>
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      These come from <code>src/lib/auth.ts</code>. The server checks them on every protected request, so hiding a
+      link is never the only protection.
+    </p>
+  </section>
+
+  <!--
+    TODO (team): build your feature pages from here, for example:
+      /staff/requests/new   — show only if can(staff, 'submit_request')
+      /staff/requests       — list requests this person may see
+    Start each page with requireStaffPage(Astro), and check can(...) again in the API route.
+  -->
+</StaffLayout>

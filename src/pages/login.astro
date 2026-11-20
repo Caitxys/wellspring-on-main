@@ -1,0 +1,65 @@
+---
+import StaffLayout from '../layouts/StaffLayout.astro';
+
+export const prerender = false;
+
+// Only return people to staff pages after sign-in (never to another site).
+const rawNext = Astro.url.searchParams.get('next') ?? '';
+const next = rawNext.startsWith('/staff') ? rawNext : '/staff';
+
+let error = '';
+let email = '';
+
+if (Astro.url.searchParams.get('error') === 'not_staff') {
+  error = 'This account is signed in but is not linked to a Wellspring staff member. Ask an administrator to run database/02_link_test_accounts.sql.';
+}
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  email = String(form.get('email') ?? '').trim();
+  const password = String(form.get('password') ?? '');
+
+  if (!email || !password) {
+    error = 'Enter your email and password.';
+  } else {
+    const { error: signInError } = await Astro.locals.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (signInError) {
+      error = 'That email and password do not match a staff account.';
+    } else {
+      return Astro.redirect(next, 303);
+    }
+  }
+} else if (Astro.locals.staff) {
+  return Astro.redirect(next);
+}
+
+const signedOut = Astro.url.searchParams.has('signed_out');
+---
+
+<StaffLayout title="Staff sign in">
+  <div class="narrow">
+    <div class="panel">
+      <h1>Staff sign in</h1>
+      <p class="lead">Sign in to submit or review website content updates.</p>
+
+      {signedOut && !error && <div class="alert alert-info" role="status">You are signed out.</div>}
+      {error && <div class="alert alert-error" role="alert">{error}</div>}
+
+      <form method="post">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="username" required value={email} />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Sign in</button>
+      </form>
+    </div>
+    <p><a href="/">Back to the website</a></p>
+  </div>
+</StaffLayout>
