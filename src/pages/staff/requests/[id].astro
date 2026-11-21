@@ -1,0 +1,113 @@
+---
+import StaffLayout from '../../../layouts/StaffLayout.astro';
+import { can } from '../../../lib/auth';
+import { requireStaffPage } from '../../../lib/page-guard';
+
+export const prerender = false;
+
+const staff = requireStaffPage(Astro);
+if (staff instanceof Response) return staff;
+
+const requestId = Number(Astro.params.id);
+
+// Row Level Security only returns this request if this person may see it.
+const { data: r, error } = await Astro.locals.supabase
+  .from('update_request')
+  .select(
+    `request_id, request_status, proposed_details, submitted_at, reviewed_at,
+     content_item ( content_id, title, body, owner_staff_id, web_page ( page_title ),
+                    owner:staff!owner_staff_id ( full_name ) ),
+     submitter:staff!submitted_by_staff_id ( full_name ),
+     reviewer:staff!reviewed_by_staff_id ( full_name )`,
+  )
+  .eq('request_id', requestId)
+  .maybeSingle();
+
+if (error) console.error('Loading request failed:', error);
+if (!r) Astro.response.status = 404;
+
+const req = r as any;
+const canReview =
+  !!req &&
+  can(staff, 'review_request') &&
+  req.content_item?.owner_staff_id === staff.staff_id &&
+  req.request_status === 'pending';
+---
+
+<StaffLayout title={req ? `Request #${req.request_id}` : 'Request not found'}>
+  <p><a href="/staff/requests">← All requests</a></p>
+
+  {
+    !req ? (
+      <div class="alert alert-error">This request does not exist, or you do not have access to it.</div>
+    ) : (
+      <>
+        <h1>Request #{req.request_id}: {req.content_item?.title}</h1>
+        <section class="panel">
+          <p><strong>Page:</strong> {req.content_item?.web_page?.page_title}</p>
+          <p><strong>Content owner:</strong> {req.content_item?.owner?.full_name}</p>
+          <p><strong>Submitted by:</strong> {req.submitter?.full_name} on {new Date(req.submitted_at).toLocaleString()}</p>
+          <p><strong>Status:</strong> <span class={`status status-${req.request_status}`}>{req.request_status}</span>
+            {req.reviewer && <> (by {req.reviewer.full_name})</>}
+          </p>
+          <h2>Proposed details</h2>
+          <p>{req.proposed_details}</p>
+          <h2>Current website text</h2>
+          <p>{req.content_item?.body}</p>
+        </section>
+
+        {canReview && (
+          <form id="review-form" class="panel" data-request-id={req.request_id} novalidate>
+            <h2>Review this request</h2>
+            <div id="form-message" role="status" aria-live="polite" />
+
+            <div class="field">
+              <label for="new_body">Updated website text (required to approve)</label>
+              <textarea id="new_body" name="new_body" rows="5">{req.content_item?.body}</textarea>
+              <p class="field-error" data-error-for="new_body" />
+            </div>
+            <p class="field-error" data-error-for="decision" />
+
+            <div class="button-row">
+              <button type="submit" name="decision" value="approved" class="btn btn-primary">Approve and publish</button>
+              <button type="submit" name="decision" value="rejected" class="btn btn-secondary">Reject</button>
+            </div>
+          </form>
+        )}
+      </>
+    )
+  }
+</StaffLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#review-form');
+  const message = document.querySelector<HTMLElement>('#form-message');
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    form.querySelectorAll('[data-error-for]').forEach((el) => (el.textContent = ''));
+
+    const button = event.submitter as HTMLButtonElement | null;
+    const body = { decision: button?.value, new_body: new FormData(form).get('new_body') };
+
+    const response = await fetch(`/api/requests/${form.dataset.requestId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const result = await response.json();
+
+    if (message) {
+      message.className = response.ok ? 'alert alert-success' : 'alert alert-error';
+      message.textContent = response.ok ? `${result.message} Reloading…` : result.error;
+    }
+    if (response.ok) {
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      for (const [field, text] of Object.entries(result.errors ?? {})) {
+        const slot = form.querySelector(`[data-error-for="${field}"]`);
+        if (slot) slot.textContent = String(text);
+      }
+    }
+  });
+</script>

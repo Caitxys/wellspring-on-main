@@ -1,0 +1,91 @@
+---
+import StaffLayout from '../../../layouts/StaffLayout.astro';
+import { can } from '../../../lib/auth';
+import { requireStaffPage } from '../../../lib/page-guard';
+
+export const prerender = false;
+
+const staff = requireStaffPage(Astro);
+if (staff instanceof Response) return staff;
+
+// Filter control: ?status=pending | approved | rejected (anything else = all)
+const STATUSES = ['pending', 'approved', 'rejected'];
+const status = Astro.url.searchParams.get('status') ?? 'all';
+
+// Related tables: request + its content item + that item's page + the submitter's name.
+let query = Astro.locals.supabase
+  .from('update_request')
+  .select(
+    `request_id, request_status, proposed_details, submitted_at,
+     content_item!inner ( content_id, title, owner_staff_id, web_page ( page_title ) ),
+     submitter:staff!submitted_by_staff_id ( full_name )`,
+  );
+
+// Who sees what:
+//   Executive Director -> every request
+//   Content Owner      -> requests for content they own
+//   Leads              -> requests they submitted
+if (!can(staff, 'view_all_requests')) {
+  if (can(staff, 'review_request')) {
+    query = query.eq('content_item.owner_staff_id', staff.staff_id);
+  } else {
+    query = query.eq('submitted_by_staff_id', staff.staff_id);
+  }
+}
+
+if (STATUSES.includes(status)) {
+  query = query.eq('request_status', status);
+}
+
+const { data: requests, error } = await query.order('submitted_at', { ascending: false });
+if (error) console.error('Loading requests failed:', error);
+---
+
+<StaffLayout title="Update requests">
+  <p><a href="/staff">← Staff home</a></p>
+  <h1>Update requests</h1>
+
+  <form method="get" class="toolbar">
+    <div class="field">
+      <label for="status">Filter by status</label>
+      <select id="status" name="status">
+        <option value="all" selected={status === 'all'}>All</option>
+        {STATUSES.map((s) => <option value={s} selected={status === s}>{s}</option>)}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary btn-sm">Apply</button>
+  </form>
+
+  {error && <div class="alert alert-error">The requests could not be loaded. Check the terminal for details.</div>}
+
+  {
+    requests && requests.length > 0 ? (
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Content (page)</th>
+            <th>Submitted by</th>
+            <th>Status</th>
+            <th>Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((r: any) => (
+            <tr>
+              <td><a href={`/staff/requests/${r.request_id}`}>#{r.request_id}</a></td>
+              <td>
+                {r.content_item?.title} <span class="muted">({r.content_item?.web_page?.page_title})</span>
+              </td>
+              <td>{r.submitter?.full_name}</td>
+              <td><span class={`status status-${r.request_status}`}>{r.request_status}</span></td>
+              <td>{new Date(r.submitted_at).toLocaleDateString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      !error && <p class="alert alert-info">No matching requests.</p>
+    )
+  }
+</StaffLayout>

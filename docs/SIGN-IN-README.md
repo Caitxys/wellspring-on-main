@@ -2,7 +2,7 @@
 
 This guide explains how staff sign-in was added to the Wellspring site, and how to set it up again yourself, step by step. You don't need a programming background. If you can copy and paste, follow a numbered list and use a website dashboard, you can do this.
 
-For the technical version, see [AUTH.md](AUTH.md). Once sign-in works, build the update-request feature with [FEATURE-GUIDE.md](FEATURE-GUIDE.md), and see [TEAM-DATABASE-SETUP.md](TEAM-DATABASE-SETUP.md) for connecting teammates and testing.
+For the technical version, see [AUTH.md](AUTH.md). Once sign-in works, build the update-request feature with [FEATURE-GUIDE.md](FEATURE-GUIDE.md).
 
 ---
 
@@ -210,13 +210,11 @@ Each line says "this action is allowed for these roles". Add or remove a role na
 
 If you ever need to recreate this in a brand-new project, these are the steps that were taken, in order. Each one maps to files that already exist here, so you can copy them over.
 
-1. **Created an Astro website** and added the Cloudflare "adapter", which lets pages run on a server (Cloudflare Workers) instead of being plain files. The project started on a Node server and was later switched to Cloudflare for hosting; see [DEPLOY.md](DEPLOY.md).
+1. **Created an Astro website** and added the Node "adapter", which lets pages run on a server instead of being plain files:
    ```
    npm create astro@latest
-   npm install @astrojs/cloudflare@12
-   npm install -D wrangler
+   npx astro add node
    ```
-   Then set the adapter in `astro.config.mjs` and add `wrangler.jsonc` and `public/.assetsignore` (copy them from this project).
 2. **Installed the Supabase tools** that handle logins and keep people signed in with a browser cookie:
    ```
    npm install @supabase/supabase-js @supabase/ssr
