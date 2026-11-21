@@ -22,8 +22,7 @@ A **Programs Lead** or **Events Lead** submits a request to change a piece of we
 | **Search / sort / filter** | A "Filter by status" menu (pending / approved / rejected) | Step 4 |
 | **Update** | The content owner approves or rejects, which changes `request_status` and the item's text | Steps 5–6 |
 | **Server validation** | The API routes reject missing or invalid fields with a 400 and a clear message | Steps 2 and 5 |
-| **Protected access** | Every page and route checks who's signed in and their role on the server; the database rules check again | Steps 1, 2, 5 and 8 |
-| **Archive** (needed for testing) | A content owner archives one of their items; blocked while a request is pending | Step 7 |
+| **Protected access** | Every page and route checks who's signed in and their role on the server; the database rules check again | Steps 1, 2, 5 and 7 |
 
 ## The pieces you'll create
 
@@ -34,8 +33,6 @@ src/pages/staff/requests/new.astro    Step 3  the submit form
 src/pages/staff/requests/index.astro  Step 4  the list + filter
 src/pages/api/requests/[id].ts        Step 5  PATCH: approve or reject
 src/pages/staff/requests/[id].astro   Step 6  the request detail + review form
-src/pages/api/content/[id].ts         Step 7  PATCH: archive a content item
-src/pages/staff/content/index.astro   Step 7  "My content" list + archive button
 ```
 
 The staff home page (`/staff`) already shows a **Your tasks** box with links to these pages, matched to each person's role. A link shows "404 Not Found" until you create its page. That's expected.
@@ -66,7 +63,7 @@ The form and table styles are already in `src/styles/staff.css`, so the new page
 GRANT SELECT ON web_page, audience, content_audience, content_item TO authenticated;
 GRANT SELECT, INSERT ON update_request TO authenticated;
 GRANT UPDATE (request_status, reviewed_by_staff_id, reviewed_at) ON update_request TO authenticated;
-GRANT UPDATE (body, status, last_reviewed_date, is_published) ON content_item TO authenticated;
+GRANT UPDATE (body, status, last_reviewed_date) ON content_item TO authenticated;
 GRANT USAGE ON SEQUENCE update_request_request_id_seq TO authenticated;
 
 -- 2. Turn on Row Level Security ----------------------------------------
@@ -142,12 +139,12 @@ CREATE POLICY update_request_review ON update_request
 
 **What these rules mean, in plain words:**
 
-| Person | Can see requests… | Can submit? | Can approve/reject? | Can edit or archive content? |
-|---|---|---|---|---|
-| Maya (Programs Lead) | that she submitted | Yes, as herself | No | No |
-| Jordan / Priya (Content Owner) | for content they own | No | Only for content they own, only while pending | Only content they own |
-| Dana (Executive Director) | all of them | No | No | No |
-| Signed-out visitor | none | No | No | No |
+| Person | Can see requests… | Can submit? | Can approve/reject? |
+|---|---|---|---|
+| Maya (Programs Lead) | that she submitted | Yes, as herself | No |
+| Jordan / Priya (Content Owner) | for content they own | No | Only for content they own, only while pending |
+| Dana (Executive Director) | all of them | No | No |
+| Signed-out visitor | none | No | No |
 
 **Check it:** in the SQL Editor, run:
 
@@ -781,255 +778,7 @@ const canReview =
 
 ---
 
-## Step 7: Archive a content item (needed for testing)
-
-**Why:** Archiving isn't required for the feature itself, but the testing phase asks you to test **archive, delete or deactivate**. Build it now, so those tests can pass instead of being marked "Blocked". It also gives you a good **business rule** and **conflicting action** to test:
-
-- Only the item's **owner** can archive it.
-- An archived item is taken off the public site (`is_published` is set to false; Business Rule 9).
-- An item with a **pending** update request can't be archived until the request is approved or rejected (409 Conflict).
-
-This matches the "My content → Archive" screen in your prototype. The staff home page already shows a **My content** link to Content Owners.
-
-**Part 1 is already done:** the `PERMISSIONS` list in `src/lib/auth.ts` includes the archive permission. You'll use it in the route and page below:
-
-```ts
-export const PERMISSIONS = {
-  submit_request: ['Programs Lead', 'Events Lead'],
-  review_request: ['Content Owner'],
-  view_all_requests: ['Executive Director'],
-  archive_content: ['Content Owner'],   // ← already added
-} as const satisfies Record<string, readonly string[]>;
-```
-
-**Do this, part 2:** create the server route, `src/pages/api/content/[id].ts`:
-
-```ts
-import type { APIRoute } from 'astro';
-import { json, requirePermission } from '../../../lib/http';
-
-export const prerender = false;
-
-/**
- * PATCH /api/content/:id — the item's owner archives a content item.
- * Body (JSON): { action: 'archive' }
- * Archived items are taken off the public site (Business Rule 9).
- */
-export const PATCH: APIRoute = async ({ locals, params, request }) => {
-  // 1. Signed in, and a role that may archive? (401 / 403)
-  const staff = requirePermission(locals, 'archive_content');
-  if (staff instanceof Response) return staff;
-
-  // 2. Check the input. (400)
-  const contentId = Number(params.id);
-  if (!Number.isInteger(contentId) || contentId <= 0) {
-    return json(400, { error: 'That is not a valid content item number.' });
-  }
-
-  let input: Record<string, unknown>;
-  try {
-    input = await request.json();
-  } catch {
-    return json(400, { error: 'Send the action as JSON.' });
-  }
-  if (input.action !== 'archive') {
-    return json(400, { error: 'The only supported action is "archive".' });
-  }
-
-  // 3. Load the item. (404)
-  const { data: item } = await locals.supabase
-    .from('content_item')
-    .select('content_id, title, status, owner_staff_id')
-    .eq('content_id', contentId)
-    .maybeSingle();
-
-  if (!item) {
-    return json(404, { error: `Content item #${contentId} was not found.` });
-  }
-
-  // 4. Only the owner may archive it. (403)
-  if (item.owner_staff_id !== staff.staff_id) {
-    return json(403, { error: 'Only the owner of this content item can archive it.' });
-  }
-
-  // 5. Conflicts. (409)
-  if (item.status === 'archived') {
-    return json(409, { error: `"${item.title}" is already archived.` });
-  }
-  const { count } = await locals.supabase
-    .from('update_request')
-    .select('request_id', { count: 'exact', head: true })
-    .eq('content_id', contentId)
-    .eq('request_status', 'pending');
-
-  if ((count ?? 0) > 0) {
-    return json(409, {
-      error: `"${item.title}" has a pending update request. Approve or reject it before archiving.`,
-    });
-  }
-
-  // 6. Archive: set the status and take it off the public site.
-  const { data: saved, error } = await locals.supabase
-    .from('content_item')
-    .update({ status: 'archived', is_published: false })
-    .eq('content_id', contentId)
-    .select('content_id');
-
-  if (error || !saved || saved.length === 0) {
-    console.error('Archiving content_item failed:', error ?? 'no rows updated (check RLS policies)');
-    return json(500, { error: 'The item could not be archived. Please try again.' });
-  }
-
-  return json(200, { message: `"${item.title}" was archived and removed from the public site.` });
-};
-```
-
-**Do this, part 3:** create the page, `src/pages/staff/content/index.astro`. It lists the owner's content items with their page and **audiences** (another relationship, through the `content_audience` table), has a **Show** filter and an **Archive** button on each active item.
-
-```astro
----
-import StaffLayout from '../../../layouts/StaffLayout.astro';
-import { can } from '../../../lib/auth';
-import { requireStaffPage } from '../../../lib/page-guard';
-
-export const prerender = false;
-
-const staff = requireStaffPage(Astro);
-if (staff instanceof Response) return staff;
-
-const allowed = can(staff, 'archive_content');
-if (!allowed) Astro.response.status = 403;
-
-// Filter: ?show=active (default) | archived | all
-const show = Astro.url.searchParams.get('show') ?? 'active';
-
-// Related tables: item + its page + its audiences (through content_audience).
-let query = Astro.locals.supabase
-  .from('content_item')
-  .select(
-    `content_id, title, status, is_published, last_reviewed_date,
-     web_page ( page_title ),
-     content_audience ( audience ( audience_name ) )`,
-  )
-  .eq('owner_staff_id', staff.staff_id);
-
-if (show === 'active') query = query.neq('status', 'archived');
-if (show === 'archived') query = query.eq('status', 'archived');
-
-const { data: items, error } = allowed ? await query.order('title') : { data: [], error: null };
-if (error) console.error('Loading content failed:', error);
----
-
-<StaffLayout title="My content">
-  <p><a href="/staff">← Staff home</a></p>
-  <h1>My content</h1>
-
-  {
-    !allowed ? (
-      <div class="alert alert-error">Only Content Owners can manage content items.</div>
-    ) : (
-      <>
-        <div id="form-message" role="status" aria-live="polite" />
-
-        <form method="get" class="toolbar">
-          <div class="field">
-            <label for="show">Show</label>
-            <select id="show" name="show">
-              <option value="active" selected={show === 'active'}>Active (not archived)</option>
-              <option value="archived" selected={show === 'archived'}>Archived</option>
-              <option value="all" selected={show === 'all'}>Everything</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-secondary btn-sm">Apply</button>
-        </form>
-
-        {error && <div class="alert alert-error">Your content could not be loaded. Check the terminal for details.</div>}
-
-        {items && items.length > 0 ? (
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Title (page)</th>
-                <th>Audiences</th>
-                <th>Status</th>
-                <th>Published</th>
-                <th><span class="visually-hidden">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((c: any) => (
-                <tr>
-                  <td>
-                    {c.title} <span class="muted">({c.web_page?.page_title})</span>
-                  </td>
-                  <td>{(c.content_audience ?? []).map((ca: any) => ca.audience?.audience_name).join(', ')}</td>
-                  <td><span class={`status status-${c.status}`}>{c.status}</span></td>
-                  <td>{c.is_published ? 'Yes' : 'No'}</td>
-                  <td>
-                    {c.status !== 'archived' && (
-                      <button type="button" class="btn btn-secondary btn-sm archive-btn" data-id={c.content_id} data-title={c.title}>
-                        Archive
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          !error && <p class="alert alert-info">No matching content.</p>
-        )}
-      </>
-    )
-  }
-</StaffLayout>
-
-<script>
-  const message = document.querySelector<HTMLElement>('#form-message');
-
-  document.querySelectorAll<HTMLButtonElement>('.archive-btn').forEach((button) => {
-    button.addEventListener('click', async () => {
-      if (!confirm(`Archive "${button.dataset.title}"? It will be removed from the public site.`)) return;
-
-      const response = await fetch(`/api/content/${button.dataset.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'archive' }),
-      });
-      const result = await response.json();
-
-      if (message) {
-        message.className = response.ok ? 'alert alert-success' : 'alert alert-error';
-        message.textContent = response.ok ? `${result.message} Reloading…` : result.error;
-        message.scrollIntoView({ block: 'nearest' });
-      }
-      if (response.ok) setTimeout(() => location.reload(), 1500);
-    });
-  });
-</script>
-```
-
-**Check it:**
-
-1. Sign in as **Priya** and open **My content**. You should see her four items, each with its page and audiences.
-2. Click **Archive** on "Tenant Parking Information" and confirm. You should see a green message, and after the reload the item is gone from **Active**.
-3. Change **Show** to **Archived** and click **Apply**. The item is listed as archived, and Published says **No**.
-4. Sign in as **Jordan** and try to archive "Saturday Youth Art Workshop" while its request is still **pending**. You should see the red message `…has a pending update request. Approve or reject it before archiving.`
-5. Direct check, signed in as **Maya**:
-
-   ```js
-   fetch('/api/content/3', {
-     method: 'PATCH',
-     headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ action: 'archive' })
-   }).then(async r => console.log(r.status, await r.json()));
-   ```
-
-   Expected: **403**, `Your role (Programs Lead) does not allow this action.` As **Jordan**, the same code returns **403** `Only the owner of this content item can archive it.` (item 3 is Priya's).
-
----
-
-## Step 8: The two direct checks the README must include
+## Step 7: The two direct checks the README must include
 
 Your README must show how to send requests **directly to the server**, skipping the form, to prove the server protects itself. Paste these into the browser console.
 
@@ -1068,7 +817,7 @@ Afterwards, sign in as Jordan and confirm request 2 is still **pending**.
 
 ---
 
-## Step 9: Finish up
+## Step 8: Finish up
 
 - [ ] **Remove the example route** `src/pages/api/examples/review-check.ts` once your real routes work. It was only there to test roles.
 - [ ] **Sample data:** your team's database SQL already includes fictional data with requests in every status. Include it in the `database/` folder as `00_schema_and_sample_data.sql` (or similar), so anyone running the project can rebuild the database.
@@ -1092,11 +841,7 @@ Afterwards, sign in as Jordan and confirm request 2 is still **pending**.
 | 6 | Jordan | Open the request, edit the text, **Approve and publish**, then reload | Status approved, new text shown, still there after reload |
 | 7 | Priya | Open that same request by its number | "Does not exist, or you do not have access" |
 | 8 | Dana | Open **All update requests** | Every request is listed |
-| 9 | Anyone | Direct checks A and B (Step 8) | 400, then 401 / 403 / 404 |
-| 10 | Priya | **My content** → archive "Tenant Parking Information", then **Show: Archived** | Green message; item listed as archived, not published |
-| 11 | Jordan | Archive an item that has a pending request | Red "has a pending update request" message; item unchanged |
-
-For the full testing phase, including the data reset and the server-restart test, see [TEAM-DATABASE-SETUP.md](TEAM-DATABASE-SETUP.md).
+| 9 | Anyone | Direct checks A and B (Step 7) | 400, then 401 / 403 / 404 |
 
 ---
 
@@ -1121,9 +866,7 @@ For the full testing phase, including the data reset and the server-restart test
 | Console check returns **401** even though you're signed in | You're on a different address than the one you signed in on | Use `http://localhost:4321` everywhere, not `127.0.0.1` |
 | 403 `Your role (…) does not allow this action.` when you expected success | The role spelling in the database doesn't match `src/lib/auth.ts` | Spell the role exactly: `Programs Lead`, `Events Lead`, `Content Owner`, `Executive Director` |
 | `violates check constraint "review_matches_status"` | Rule 5: approving or rejecting needs both a reviewer and a review time | Use the route from Step 5, which sets both |
-| `violates check constraint "archived_not_published"` | Rule 9: archived items can't be published | Don't set an archived item to published. The archive route in Step 7 sets both fields together |
-| Archive returns 500 with `permission denied for table content_item` in the Terminal | The `is_published` column isn't allowed to change yet | Re-run the current `03_feature_access.sql`. Its `GRANT UPDATE` line must include `is_published` |
-| Archive returns **409** | The item is already archived, or it has a pending request | Expected behavior. Approve or reject the request first |
+| `violates check constraint "archived_not_published"` | Rule 9: archived items can't be published | Don't set an archived item to published |
 | Changes to `.env` don't take effect | The server reads `.env` only at start-up | Stop with Ctrl+C and run `npm run dev` again |
 
 **Asking for help well:** copy the **exact** error from the Terminal and the console, say who you were signed in as, and what you clicked. That's usually enough to find the problem in a few minutes.
@@ -1180,9 +923,8 @@ The feature uses related tables: `update_request` references `content_item` (whi
 2. **Read + related tables:** open My update requests and reload. The request shows its content item, page and submitter.
 3. **Update:** sign in as Jordan → Review queue → open the request → edit the text → Approve and publish. Reload: the status stays approved and the new text is shown.
 4. **Filter:** on the requests list, choose a status and click Apply.
-5. **Archive:** sign in as Priya → My content → Archive "Tenant Parking Information" → Show: Archived. The item is archived and no longer published.
-6. **Invalid request (expect 400):** [paste Check A from the guide]
-7. **Protected request (expect 401 signed out, 403 as Maya or Dana, 404 as Priya):** [paste Check B from the guide]
+5. **Invalid request (expect 400):** [paste Check A from the guide]
+6. **Protected request (expect 401 signed out, 403 as Maya or Dana, 404 as Priya):** [paste Check B from the guide]
 
 ## 4. Known limitations
 - [List anything that doesn't work yet, or write "No known issues."]

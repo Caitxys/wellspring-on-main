@@ -1,0 +1,92 @@
+---
+import StaffLayout from '../../../layouts/StaffLayout.astro';
+import { can } from '../../../lib/auth';
+import { requireStaffPage } from '../../../lib/page-guard';
+
+export const prerender = false;
+
+const staff = requireStaffPage(Astro);
+if (staff instanceof Response) return staff;
+
+const allowed = can(staff, 'submit_request');
+if (!allowed) Astro.response.status = 403;
+
+// Related tables: each content item plus the title of the page it appears on.
+const { data: items, error } = allowed
+  ? await Astro.locals.supabase
+      .from('content_item')
+      .select('content_id, title, web_page(page_title)')
+      .neq('status', 'archived')
+      .order('title')
+  : { data: [], error: null };
+
+if (error) console.error('Loading content items failed:', error);
+---
+
+<StaffLayout title="Submit an update request">
+  <p><a href="/staff">← Staff home</a></p>
+  <h1>Submit an update request</h1>
+
+  {
+    !allowed ? (
+      <div class="alert alert-error">Only Programs Leads and Events Leads can submit update requests.</div>
+    ) : (
+      <form id="request-form" class="panel" novalidate>
+        <div id="form-message" role="status" aria-live="polite" />
+
+        <div class="field">
+          <label for="content_id">Website content to update</label>
+          <select id="content_id" name="content_id" required>
+            <option value="">Choose a content item…</option>
+            {(items ?? []).map((item: any) => (
+              <option value={item.content_id}>
+                {item.title} ({item.web_page?.page_title})
+              </option>
+            ))}
+          </select>
+          <p class="field-error" data-error-for="content_id" />
+        </div>
+
+        <div class="field">
+          <label for="proposed_details">Proposed details</label>
+          <textarea id="proposed_details" name="proposed_details" rows="5" required />
+          <p class="field-error" data-error-for="proposed_details" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit request</button>
+      </form>
+    )
+  }
+</StaffLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#request-form');
+  const message = document.querySelector<HTMLElement>('#form-message');
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    form.querySelectorAll('[data-error-for]').forEach((el) => (el.textContent = ''));
+
+    const body = Object.fromEntries(new FormData(form));
+    const response = await fetch('/api/requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const result = await response.json();
+
+    if (message) {
+      message.className = response.ok ? 'alert alert-success' : 'alert alert-error';
+      message.textContent = response.ok ? result.message : result.error;
+    }
+    if (response.ok) {
+      form.reset();
+    } else {
+      for (const [field, text] of Object.entries(result.errors ?? {})) {
+        const slot = form.querySelector(`[data-error-for="${field}"]`);
+        if (slot) slot.textContent = String(text);
+      }
+    }
+  });
+</script>
+
