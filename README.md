@@ -140,7 +140,12 @@ The production build completed successfully using:
 
 ## 8. Team Contributions
 
-Add each team member's name and describe their specific contributions to the project.
+Caitlin Hartman - Database Manager, Web Content Copywriter
+Rosa Vargas - Lead Videographer/Editor, Photography
+Preston Page - Videopgrapher/Editor, Photography
+Hamshini Ananth - ERD Design and Workflow Specialist
+Andrew Looney - Motion Graphic Designer
+Dylan McKoy - Database Manager, Supabase Manager
 
 ## 9. AI Assistance
 
